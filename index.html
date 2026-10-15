@@ -31,7 +31,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .rp{font:600 22px var(--fd);fill:var(--text)}
 .who{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
 .who button{background:none;border-radius:20px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:background .25s}
-.who button.on{background:color-mix(in srgb,var(--pc) 24%,var(--card))}
+.who button.on{background:var(--pd);color:#fff;box-shadow:0 8px 20px color-mix(in srgb,var(--pd) 35%,transparent)}
+.who button.on small{color:rgba(255,255,255,.88)}
 .who b{font:600 15px var(--fd)}
 .who small{font-size:12px;color:var(--mute);font-weight:600}
 .both{font-size:13px;color:var(--mute);font-weight:600;text-align:center}
@@ -103,7 +104,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 <div class="wrap" id="app"></div>
 <script>
 const H=[{n:'Английский язык',u:'ч',g:1.5,s:.5},{n:'Чтение книги',u:'ч',g:1,s:.5},{n:'Ходьба',u:'шагов',g:8000,s:1000},{n:'Сон (минимум)',u:'ч',g:7,s:.5}];
-const PEOPLE=[{id:'emir',n:'Эмир',acc:'#8fb4ec'},{id:'saida',n:'Саида',acc:'#f0a9c6'}];
+const PEOPLE=[{id:'emir',n:'Эмир',acc:'#8fb4ec',deep:'#4a82f0'},{id:'saida',n:'Саида',acc:'#f0a9c6',deep:'#ea5a90'}];
 const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const MG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const WD=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
@@ -178,7 +179,7 @@ for(let d=1;d<=nd;d++){const k=key(vy,vm,d);if(PEOPLE.every(p=>pctOf(P[p.id],k)=
 const order=who===PEOPLE[0].id?[1,0]:[0,1];
 const twin=`<svg class="twin" viewBox="0 0 320 170" role="img" aria-label="Прогресс месяца">${order.map(ix=>{const p=PEOPLE[ix],cx=ix?218:102,sel=p.id===who,col=(sel&&isFull)?'#f1b93a':p.acc;
 return arc(cx,85,64,15,mo[ix].mp,col,sel?1:.55)+`<text x="${cx}" y="94" text-anchor="middle" class="rp" opacity="${sel?1:.6}">${Math.round(mo[ix].mp*100)}%</text>`}).join('')}</svg>`;
-const who_=`<div class="who">${PEOPLE.map((p,ix)=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc}"><b>${p.n}</b><small>${mo[ix].full} дн. со 100%</small></button>`).join('')}</div>`;
+const who_=`<div class="who">${PEOPLE.map((p,ix)=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc};--pd:${p.deep}"><b>${p.n}</b><small>${mo[ix].full} дн. со 100%</small></button>`).join('')}</div>`;
 let cal=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="dow">${x}</div>`).join('')+'<div class="d e"></div>'.repeat(off);
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(S,k);
 cal+=`<button class="d ${p===1?'full':''} ${k===sel?'sel':''} ${k===todayK()?'today':''}" style="--p:${Math.round((p||0)*100)}%" data-k="${k}"><span>${d}</span></button>`}
