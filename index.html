@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Трекер привычек · Эмир и Саида</title>
 <style>
-:root{--bg:#f4f6fb;--card:#fff;--cell:#eef1f8;--track:#e6eaf4;--text:#3a4363;--mute:#8a93b0;--green:#7fcfae;--gold:#ffe3a0;--goldtxt:#8a6a1f;--c0:#8fb4ec;--c1:#b9a6e6;--c2:#f3b88a;--c3:#7fd0c0;--shadow:0 6px 24px rgba(80,96,150,.08);
+:root{--bg:#f4f6fb;--card:#fff;--cell:#eef1f8;--track:#e6eaf4;--text:#3a4363;--mute:#8a93b0;--green:#7fcfae;--okc:#3f8f66;--gold:#ffe3a0;--goldtxt:#8a6a1f;--c0:#8fb4ec;--c1:#b9a6e6;--c2:#f3b88a;--c3:#7fd0c0;--shadow:0 6px 24px rgba(80,96,150,.08);
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171a26;--card:#20243a;--cell:#2a2f48;--track:#2f3552;--text:#e4e8f6;--mute:#8d96b8;--green:#4f9c80;--gold:#6b5a2a;--goldtxt:#ffe3a0;--shadow:0 6px 24px rgba(0,0,0,.25)}}
-:root[data-theme="dark"]{--bg:#171a26;--card:#20243a;--cell:#2a2f48;--track:#2f3552;--text:#e4e8f6;--mute:#8d96b8;--green:#4f9c80;--gold:#6b5a2a;--goldtxt:#ffe3a0;--shadow:0 6px 24px rgba(0,0,0,.25)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171a26;--card:#20243a;--cell:#2a2f48;--track:#2f3552;--text:#e4e8f6;--mute:#8d96b8;--green:#4f9c80;--okc:#7fd9b2;--gold:#6b5a2a;--goldtxt:#ffe3a0;--shadow:0 6px 24px rgba(0,0,0,.25)}}
+:root[data-theme="dark"]{--bg:#171a26;--card:#20243a;--cell:#2a2f48;--track:#2f3552;--text:#e4e8f6;--mute:#8d96b8;--green:#4f9c80;--okc:#7fd9b2;--gold:#6b5a2a;--goldtxt:#ffe3a0;--shadow:0 6px 24px rgba(0,0,0,.25)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
@@ -63,6 +63,19 @@ button{font:inherit;color:inherit;border:0;cursor:pointer}
 .mini{flex:1;border-radius:20px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px}
 .mini.on{outline:2px solid var(--acc)}
 .mini .ringbox b{font-size:15px}
+.tabs button{height:34px;font-size:14px}
+.hr{display:grid;grid-template-columns:44px 1fr 1fr;gap:8px;align-items:stretch;margin-bottom:8px}
+.hdt{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px}
+.hdt small{color:var(--mute);font-size:11px}
+.hc{background:var(--card);border-radius:16px;padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:var(--shadow)}
+.hc.full{background:var(--gold);color:var(--goldtxt)}
+.hc b{font-size:15px}
+.hc span{display:flex;gap:6px;font-size:11px}
+.hc u{text-decoration:none;color:var(--mute)}
+.hc u.ok{color:var(--okc);font-weight:600}
+.hc i{font-size:11px;color:var(--mute);font-style:normal;padding:8px 0}
+.hn{display:flex;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:14px}
+.note{font-size:11px;color:var(--mute);text-align:center;margin:4px 0 12px}
 .sync{text-align:center;color:var(--mute);font-size:11px}
 </style>
 </head>
@@ -76,7 +89,7 @@ const MG=['января','февраля','марта','апреля','мая','
 const WD=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 const LS='habits-v2';
 const fresh=()=>({goals:H.map(h=>h.g),days:{}});
-let P={emir:fresh(),saida:fresh()},who='emir',S,showGoals=false,syncMsg='Подключение…',refs=null;
+let P={emir:fresh(),saida:fresh()},who='emir',S,showGoals=false,view='track',syncMsg='Подключение…',refs=null;
 try{const t=JSON.parse(localStorage.getItem(LS));if(t){for(const p of PEOPLE)if(t.P&&t.P[p.id]&&t.P[p.id].days)P[p.id]={goals:t.P[p.id].goals||P[p.id].goals,days:t.P[p.id].days};if(t.who&&P[t.who])who=t.who}}catch(e){}
 S=P[who];
 const now=new Date();let vy=now.getFullYear(),vm=now.getMonth();
@@ -111,9 +124,28 @@ S=P[who];if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(
 if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){if(!S.days[k])S.days[k]=[null,null,null,null];S.days[k][i]=v;if(S.days[k].every(x=>x==null))delete S.days[k];save();render()}
+const tabs=()=>`<div class="seg tabs"><button data-v="track" class="${view==='track'?'on':''}">Трекер</button><button data-v="hist" class="${view==='hist'?'on':''}">История</button></div>`;
+const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
+function renderHist(){
+const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
+const DW=['вс','пн','вт','ср','чт','пт','сб'];
+const cell=(p,k)=>{const D=P[p.id],v=D.days[k],pc=pctOf(D,k);
+if(pc==null)return `<button class="hc" data-hw="${p.id}" data-hk="${k}"><i>нет данных</i></button>`;
+return `<button class="hc ${pc===1?'full':''}" data-hw="${p.id}" data-hk="${k}"><b>${Math.round(pc*100)}%${pc===1?' ✓':''}</b><span>${v.map((x,i)=>x==null?'<u>–</u>':`<u class="${x>=D.goals[i]?'ok':''}">${short(i,x)}</u>`).join('')}</span></button>`};
+let rows='';for(let d=last;d>=1;d--){const k=key(vy,vm,d);
+rows+=`<div class="hr"><div class="hdt"><b>${d}</b><small>${DW[new Date(vy,vm,d).getDay()]}</small></div>${PEOPLE.map(p=>cell(p,k)).join('')}</div>`}
+const sum=PEOPLE.map(p=>{const m=monthOf(P[p.id]);return `<div class="mini"><div class="ringbox" style="width:64px;height:64px">${ring(m.mp,64,8,p.acc)}<b>${Math.round(m.mp*100)}%</b></div><span>${p.n} · ${m.full} дн. со 100%</span></div>`}).join('');
+document.getElementById('app').innerHTML=`${tabs()}
+<div class="top"><button class="nav" data-m="-1">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1">›</button></div>
+<div class="card"><span class="lbl" style="display:block;margin-bottom:10px">Итоги месяца</span><div class="duo">${sum}</div></div>
+<div><div class="hr"><div></div>${PEOPLE.map(p=>`<div class="hn"><span class="dot" style="background:${p.acc}"></span>${p.n}</div>`).join('')}</div>
+<div class="note">Порядок: английский · чтение · шаги · сон. Зелёным — цель выполнена. Нажми на день, чтобы открыть его в трекере.</div>
+${rows||'<div class="note">В этом месяце ещё нет дней</div>'}</div>
+<div class="sync">${syncMsg}</div>`}
 function render(){
 if(!CODE){document.getElementById('app').innerHTML='<div class="card" style="margin-top:18vh;text-align:center"><h2 style="margin:0 0 6px;font-size:19px">Трекер привычек</h2><p style="color:var(--mute);font-size:14px;margin:0">Введите код доступа — один раз на этом устройстве</p><div class="ctl" style="margin-top:16px"><input id="code" type="password" autocomplete="off" placeholder="код"><button data-c="1">→</button></div></div>';return}
 const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setProperty('--acc',acc);
+if(view==='hist'){renderHist();return}
 const M=monthOf(S),{nd,cnt,full,hd,mp}=M,isFull=cnt>0&&mp===1,off=(new Date(vy,vm,1).getDay()+6)%7;
 let cal=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="dow">${x}</div>`).join('')+'<div class="d e"></div>'.repeat(off);
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(S,k);
@@ -128,7 +160,7 @@ const stats=H.map((h,i)=>{const p=cnt?hd[i]/cnt:0;return `<div class="stat"><spa
 const goals=H.map((h,i)=>`<span>${h.n}, ${h.u}</span><input type="number" step="any" min="0" data-g="${i}" value="${S.goals[i]}">`).join('');
 const duo=PEOPLE.map(p=>{const m=monthOf(P[p.id]);return `<button class="mini ${p.id===who?'on':''}" data-w="${p.id}"><div class="ringbox" style="width:64px;height:64px">${ring(m.mp,64,8,p.acc)}<b>${Math.round(m.mp*100)}%</b></div><span>${p.n} · ${m.full} дн. со 100%</span></button>`}).join('');
 document.getElementById('app').innerHTML=`
-<div class="seg">${PEOPLE.map(p=>`<button data-w="${p.id}" class="${p.id===who?'on':''}">${p.n}</button>`).join('')}</div>
+${tabs()}<div class="seg">${PEOPLE.map(p=>`<button data-w="${p.id}" class="${p.id===who?'on':''}">${p.n}</button>`).join('')}</div>
 <div class="top"><button class="nav" data-m="-1">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1">›</button></div>
 <div class="card prog ${isFull?'full':''}"><div class="ringbox">${ring(mp,104,11,isFull?'#e0ae3a':acc)}<b>${Math.round(mp*100)}%</b></div>
 <div class="kv"><span class="lbl">Прогресс месяца</span><span><big>${full}</big> дн. со 100%</span><span>Заполнено ${cnt} из ${nd}</span>${isFull?'<span>Все цели выполнены ✓</span>':''}</div></div>
@@ -140,7 +172,9 @@ document.getElementById('app').innerHTML=`
 <div class="sync">${syncMsg}</div><button class="link" data-x="1">Сменить код доступа</button>`}
 const app=document.getElementById('app');
 app.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-if(b.dataset.c){const v=document.getElementById('code').value.trim();if(v){CODE=v;try{localStorage.setItem('habits-code',v)}catch(e){}remote=!!(CFG.url&&CFG.key);render();pull()}}
+if(b.dataset.v){view=b.dataset.v;render();window.scrollTo(0,0)}
+else if(b.dataset.hk){who=b.dataset.hw;S=P[who];sel=b.dataset.hk;view='track';save();render();window.scrollTo(0,0)}
+else if(b.dataset.c){const v=document.getElementById('code').value.trim();if(v){CODE=v;try{localStorage.setItem('habits-code',v)}catch(e){}remote=!!(CFG.url&&CFG.key);render();pull()}}
 else if(b.dataset.x){try{localStorage.removeItem('habits-code')}catch(e){}CODE='';remote=false;render()}
 else if(b.dataset.w){who=b.dataset.w;S=P[who];showGoals=false;save();render()}
 else if(b.dataset.k){sel=b.dataset.k;render()}
