@@ -146,7 +146,7 @@ if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){const was=pctOf(S,k);if(!S.days[k])S.days[k]=[null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1)setTimeout(burst,80);if(S.days[k].every(x=>x==null))delete S.days[k];save();render()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
-const tabs=()=>`<div class="seg tabs"><button data-v="track" class="${view==='track'?'on':''}">Трекер</button><button data-v="hist" class="${view==='hist'?'on':''}">История</button></div>`;
+const tabs=()=>`<div class="seg tabs"><button data-v="track" class="${view==='track'?'on':''}">Планер</button><button data-v="hist" class="${view==='hist'?'on':''}">История</button></div>`;
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
 function arc(cx,cy,r,sw,p,col,op){const c=2*Math.PI*r;return `<g opacity="${op}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${cx} ${cy})"/>`:''}</g>`}
 function burst(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -166,11 +166,11 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><button class="nav" data-m="-1">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1">›</button></div>
 <div class="card"><span class="lbl" style="display:block;margin-bottom:12px">Итоги месяца</span><div class="duo">${sum}</div></div>
 <div><div class="hr"><div></div>${PEOPLE.map(p=>`<div class="hn"><span class="dot" style="background:${p.acc}"></span>${p.n}</div>`).join('')}</div>
-<div class="note">Порядок: английский, чтение, шаги, сон. Зелёным выделена выполненная цель. Нажми на день, чтобы открыть его в трекере.</div>
+<div class="note">Порядок: английский, чтение, шаги, сон. Зелёным выделена выполненная цель. Нажми на день, чтобы открыть его в планере.</div>
 ${rows||'<div class="note">В этом месяце ещё нет дней</div>'}</div>
 <div class="sync">${syncMsg}</div>`}
 function render(){
-if(!CODE){document.getElementById('app').innerHTML='<div class="card" style="margin-top:18vh;text-align:center"><h2 style="margin:0 0 6px;font-size:19px">Трекер привычек</h2><p style="color:var(--mute);font-size:14px;margin:0">Введите код доступа — один раз на этом устройстве</p><div class="ctl" style="margin-top:16px"><input id="code" type="password" autocomplete="off" placeholder="код"><button data-c="1">→</button></div></div>';return}
+if(!CODE){document.getElementById('app').innerHTML='<div class="card" style="margin-top:18vh;text-align:center"><h2 style="margin:0 0 6px;font-size:19px">Планер</h2><p style="color:var(--mute);font-size:14px;margin:0">Введите код доступа — один раз на этом устройстве</p><div class="ctl" style="margin-top:16px"><input id="code" type="password" autocomplete="off" placeholder="код"><button data-c="1">→</button></div></div>';return}
 const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setProperty('--acc',acc);
 if(view==='hist'){renderHist();return}
 const M=monthOf(S),{nd,cnt,full,hd,mp}=M,isFull=cnt>0&&mp===1,off=(new Date(vy,vm,1).getDay()+6)%7;
