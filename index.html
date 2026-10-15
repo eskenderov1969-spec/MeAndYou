@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Трекер привычек · Эмир и Саида</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--cell:#eef1f8;--track:#e6eaf4;--text:#3a4363;--mute:#8a93b0;--green:#7fcfae;--gold:#ffe3a0;--goldtxt:#8a6a1f;--c0:#8fb4ec;--c1:#b9a6e6;--c2:#f3b88a;--c3:#7fd0c0;--shadow:0 6px 24px rgba(80,96,150,.08);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171a26;--card:#20243a;--cell:#2a2f48;--track:#2f3552;--text:#e4e8f6;--mute:#8d96b8;--green:#4f9c80;--gold:#6b5a2a;--goldtxt:#ffe3a0;--shadow:0 6px 24px rgba(0,0,0,.25)}}
+:root[data-theme="dark"]{--bg:#171a26;--card:#20243a;--cell:#2a2f48;--track:#2f3552;--text:#e4e8f6;--mute:#8d96b8;--green:#4f9c80;--gold:#6b5a2a;--goldtxt:#ffe3a0;--shadow:0 6px 24px rgba(0,0,0,.25)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:480px;margin:0 auto;padding:18px 16px 40px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border-radius:26px;padding:18px;box-shadow:var(--shadow)}
+.top{display:flex;align-items:center;justify-content:space-between}
+.top h1{font-size:19px;font-weight:600;margin:0}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.nav{width:38px;height:38px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);font-size:18px}
+.prog{display:flex;align-items:center;gap:18px;transition:background .4s}
+.prog.full{background:var(--gold)}
+.ringbox{position:relative;width:104px;height:104px;flex:none}
+.ringbox svg{display:block}
+.ringbox b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600}
+.lbl{font-size:11px;letter-spacing:.12em;color:var(--mute);text-transform:uppercase;font-weight:600}
+.prog.full .lbl{color:var(--goldtxt)}
+.kv{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.kv big{font-size:15px;font-weight:600}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{font-size:11px;color:var(--mute);text-align:center;padding-bottom:2px}
+.d{aspect-ratio:1;border-radius:14px;background:var(--cell);font-size:13px;display:flex;align-items:center;justify-content:center;position:relative;transition:transform .15s}
+.d:active{transform:scale(.93)}
+.d.e{visibility:hidden}
+.d.full{background:var(--gold);color:var(--goldtxt);font-weight:700}
+.d.sel{outline:2px solid var(--acc);outline-offset:1px}
+.d.today::after{content:"";position:absolute;bottom:5px;width:4px;height:4px;border-radius:50%;background:var(--acc)}
+.dayhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dayhead h2{margin:0;font-size:16px;font-weight:600}
+.dayhead small{color:var(--mute);display:block;margin-top:2px;font-size:12px}
+.h{background:var(--cell);border-radius:20px;padding:14px;margin-bottom:10px}
+.h:last-child{margin-bottom:0}
+.hd{display:flex;align-items:center;gap:8px;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%}
+.hd .g{margin-left:auto;color:var(--mute);font-size:12px}
+.ok{color:var(--green);font-weight:700;width:14px}
+.bar{height:8px;border-radius:99px;background:var(--track);margin:10px 0 12px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .4s}
+.ctl{display:flex;align-items:center;gap:8px}
+.ctl button{width:40px;height:40px;border-radius:50%;background:var(--card);font-size:20px;box-shadow:var(--shadow)}
+.ctl input,.gl input{flex:1;min-width:0;height:40px;border-radius:14px;border:0;background:var(--card);color:var(--text);text-align:center;font:inherit;font-size:16px;font-weight:600;outline:none}
+.ctl span{color:var(--mute);font-size:12px;width:38px}
+.stat{display:flex;align-items:center;gap:10px;font-size:13px;margin-top:12px}
+.stat span:first-child{width:92px}
+.stat .bar{flex:1;margin:0;height:8px}
+.stat em{font-style:normal;width:38px;text-align:right;color:var(--mute)}
+.link{background:none;color:var(--mute);font-size:13px;padding:6px 0;text-align:center}
+.gl{display:grid;grid-template-columns:1fr 100px;gap:8px;align-items:center;margin-top:12px;font-size:14px}
+.seg{display:flex;background:var(--card);border-radius:99px;padding:5px;box-shadow:var(--shadow)}
+.seg button{flex:1;height:40px;border-radius:99px;background:none;font-weight:600;font-size:15px;color:var(--mute);transition:all .25s}
+.seg button.on{background:var(--acc);color:#2b3350}
+.duo{display:flex;gap:10px}
+.mini{flex:1;border-radius:20px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px}
+.mini.on{outline:2px solid var(--acc)}
+.mini .ringbox b{font-size:15px}
+.sync{text-align:center;color:var(--mute);font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const H=[{n:'Английский язык',u:'ч',g:1.5,s:.5},{n:'Чтение книги',u:'ч',g:1,s:.5},{n:'Ходьба',u:'шагов',g:8000,s:1000},{n:'Сон (минимум)',u:'ч',g:7,s:.5}];
+const PEOPLE=[{id:'emir',n:'Эмир',acc:'#8fb4ec'},{id:'saida',n:'Саида',acc:'#f0a9c6'}];
+const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+const WD=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+const LS='habits-v2';
+const fresh=()=>({goals:H.map(h=>h.g),days:{}});
+let P={emir:fresh(),saida:fresh()},who='emir',S,showGoals=false,syncMsg='Подключение…',refs=null;
+try{const t=JSON.parse(localStorage.getItem(LS));if(t){for(const p of PEOPLE)if(t.P&&t.P[p.id]&&t.P[p.id].days)P[p.id]={goals:t.P[p.id].goals||P[p.id].goals,days:t.P[p.id].days};if(t.who&&P[t.who])who=t.who}}catch(e){}
+S=P[who];
+const now=new Date();let vy=now.getFullYear(),vm=now.getMonth();
+const pad=n=>String(n).padStart(2,'0');
+const key=(y,m,d)=>y+'-'+pad(m+1)+'-'+pad(d);
+const todayK=()=>key(now.getFullYear(),now.getMonth(),now.getDate());
+let sel=todayK();
+const num=n=>String(n).replace('.',',');
+const big=n=>Number(n).toLocaleString('ru-RU').replace(/\u00a0/g,' ');
+const gfmt=i=>H[i].u==='шагов'?big(S.goals[i]):num(S.goals[i]);
+function pctOf(D,k){const v=D.days[k];if(!v||v.every(x=>x==null))return null;return v.reduce((a,x,i)=>a+(x!=null&&x>=D.goals[i]?1:0),0)/4}
+function monthOf(D){const nd=new Date(vy,vm+1,0).getDate();let sum=0,cnt=0,full=0;const hd=[0,0,0,0];
+for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(D,k);if(p!=null){sum+=p;cnt++;if(p===1)full++;D.days[k].forEach((x,i)=>{if(x!=null&&x>=D.goals[i])hd[i]++})}}
+return{nd,cnt,full,hd,mp:cnt?sum/cnt:0}}
+function ring(p,sz,sw,col){const r=(sz-sw)/2,c=2*Math.PI*r,m=sz/2;
+return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}"><circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${m} ${m})"/>`:''}</svg>`}
+const CFG={url:'https://qffmezdmqmsvunmnzowl.supabase.co',key:'sb_publishable_vovS9yfPQIOAs1xRpLWcRg_rhQgFeMC'};
+try{const h=decodeURIComponent(location.hash.slice(1));if(h){localStorage.setItem('habits-code',h);history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
+let CODE='';try{CODE=localStorage.getItem('habits-code')||''}catch(e){}
+let remote=!!(CFG.url&&CFG.key&&CODE);const dirty={},tms={};
+async function rpc(fn,body){const r=await fetch(CFG.url.replace(/\/rest\/v1\/?$/,'').replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:Object.assign({'Content-Type':'application/json',apikey:CFG.key},CFG.key.startsWith('sb_')?{}:{Authorization:'Bearer '+CFG.key}),body:JSON.stringify(body)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null}
+const setSync=m=>{syncMsg=m;const e=document.querySelector('.sync');if(e)e.textContent=m};
+function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(async()=>{try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:{goals:P[w].goals,days:P[w].days}});delete dirty[w];setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — сохранено на устройстве, отправится позже')}},500)}
+function save(w=who){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
+if(remote){dirty[w]=1;push(w)}}
+async function pull(){if(!remote)return;let changed=false;
+try{for(const p of PEOPLE){const r=await rpc('get_tracker',{p_code:CODE+':'+p.id});
+if(dirty[p.id]){push(p.id);continue}
+if(r&&r.days){const n={goals:r.goals||P[p.id].goals,days:r.days};if(JSON.stringify(n)!==JSON.stringify(P[p.id])){P[p.id]=n;changed=true}}
+else if(Object.keys(P[p.id].days).length){dirty[p.id]=1;push(p.id)}}
+S=P[who];if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
+if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
+setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — данные на этом устройстве')}}
+function setVal(k,i,v){if(!S.days[k])S.days[k]=[null,null,null,null];S.days[k][i]=v;if(S.days[k].every(x=>x==null))delete S.days[k];save();render()}
+function render(){
+if(!CODE){document.getElementById('app').innerHTML='<div class="card" style="margin-top:18vh;text-align:center"><h2 style="margin:0 0 6px;font-size:19px">Трекер привычек</h2><p style="color:var(--mute);font-size:14px;margin:0">Введите код доступа — один раз на этом устройстве</p><div class="ctl" style="margin-top:16px"><input id="code" type="password" autocomplete="off" placeholder="код"><button data-c="1">→</button></div></div>';return}
+const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setProperty('--acc',acc);
+const M=monthOf(S),{nd,cnt,full,hd,mp}=M,isFull=cnt>0&&mp===1,off=(new Date(vy,vm,1).getDay()+6)%7;
+let cal=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="dow">${x}</div>`).join('')+'<div class="d e"></div>'.repeat(off);
+for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(S,k);
+const bg=p==null||p===1?'':`style="background:color-mix(in srgb,var(--green) ${Math.round(p*100)}%,var(--cell))"`;
+cal+=`<button class="d ${p===1?'full':''} ${k===sel?'sel':''} ${k===todayK()?'today':''}" data-k="${k}" ${bg}>${d}</button>`}
+const sd=sel.split('-').map(Number),dt=new Date(sd[0],sd[1]-1,sd[2]),vals=S.days[sel]||[],dp=pctOf(S,sel);
+const rows=H.map((h,i)=>{const v=vals[i],g=S.goals[i],p=v==null?0:Math.min(v/g,1),ok=v!=null&&v>=g;
+return `<div class="h"><div class="hd"><span class="dot" style="background:var(--c${i})"></span><b>${h.n}</b><span class="g">цель ${gfmt(i)} ${h.u}</span><span class="ok">${ok?'✓':''}</span></div>
+<div class="bar"><i style="width:${p*100}%;background:var(--c${i})"></i></div>
+<div class="ctl"><button data-i="${i}" data-a="-1">−</button><input type="number" inputmode="decimal" step="any" min="0" placeholder="0" data-i="${i}" value="${v==null?'':v}"><span>${h.u}</span><button data-i="${i}" data-a="1">+</button></div></div>`}).join('');
+const stats=H.map((h,i)=>{const p=cnt?hd[i]/cnt:0;return `<div class="stat"><span>${h.n.split(' ')[0]}</span><div class="bar"><i style="width:${p*100}%;background:var(--c${i})"></i></div><em>${Math.round(p*100)}%</em></div>`}).join('');
+const goals=H.map((h,i)=>`<span>${h.n}, ${h.u}</span><input type="number" step="any" min="0" data-g="${i}" value="${S.goals[i]}">`).join('');
+const duo=PEOPLE.map(p=>{const m=monthOf(P[p.id]);return `<button class="mini ${p.id===who?'on':''}" data-w="${p.id}"><div class="ringbox" style="width:64px;height:64px">${ring(m.mp,64,8,p.acc)}<b>${Math.round(m.mp*100)}%</b></div><span>${p.n} · ${m.full} дн. со 100%</span></button>`}).join('');
+document.getElementById('app').innerHTML=`
+<div class="seg">${PEOPLE.map(p=>`<button data-w="${p.id}" class="${p.id===who?'on':''}">${p.n}</button>`).join('')}</div>
+<div class="top"><button class="nav" data-m="-1">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1">›</button></div>
+<div class="card prog ${isFull?'full':''}"><div class="ringbox">${ring(mp,104,11,isFull?'#e0ae3a':acc)}<b>${Math.round(mp*100)}%</b></div>
+<div class="kv"><span class="lbl">Прогресс месяца</span><span><big>${full}</big> дн. со 100%</span><span>Заполнено ${cnt} из ${nd}</span>${isFull?'<span>Все цели выполнены ✓</span>':''}</div></div>
+<div class="card"><div class="cal">${cal}</div></div>
+<div class="card"><div class="dayhead"><div><h2>${sd[2]} ${MG[sd[1]-1]}</h2><small>${WD[dt.getDay()]} · прогресс дня ${Math.round((dp||0)*100)}%${dp===1?' ✓':''}</small></div><div class="ringbox" style="width:46px;height:46px">${ring(dp||0,46,6,dp===1?'#e0ae3a':acc)}</div></div>${rows}</div>
+<div class="card"><span class="lbl">Выполнение за месяц</span>${stats}</div>
+<div class="card"><span class="lbl" style="display:block;margin-bottom:10px">Вместе · ${MN[vm]}</span><div class="duo">${duo}</div></div>
+<button class="link" data-t="1">${showGoals?'Скрыть цели':'Изменить цели'}</button>${showGoals?`<div class="card"><span class="lbl">Цели на день · ${PEOPLE.find(p=>p.id===who).n}</span><div class="gl">${goals}</div></div>`:''}
+<div class="sync">${syncMsg}</div><button class="link" data-x="1">Сменить код доступа</button>`}
+const app=document.getElementById('app');
+app.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+if(b.dataset.c){const v=document.getElementById('code').value.trim();if(v){CODE=v;try{localStorage.setItem('habits-code',v)}catch(e){}remote=!!(CFG.url&&CFG.key);render();pull()}}
+else if(b.dataset.x){try{localStorage.removeItem('habits-code')}catch(e){}CODE='';remote=false;render()}
+else if(b.dataset.w){who=b.dataset.w;S=P[who];showGoals=false;save();render()}
+else if(b.dataset.k){sel=b.dataset.k;render()}
+else if(b.dataset.m){vm+=+b.dataset.m;if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}
+sel=(vy===now.getFullYear()&&vm===now.getMonth())?key(vy,vm,now.getDate()):key(vy,vm,1);render()}
+else if(b.dataset.a){const i=+b.dataset.i,cur=(S.days[sel]||[])[i]||0;setVal(sel,i,Math.max(0,Math.round((cur+b.dataset.a*H[i].s)*100)/100))}
+else if(b.dataset.t){showGoals=!showGoals;render()}});
+app.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='code'){const b=document.querySelector('[data-c]');if(b)b.click()}});
+app.addEventListener('change',e=>{const t=e.target;
+if(t.dataset.g!=null){const v=parseFloat(t.value);if(v>0){S.goals[+t.dataset.g]=v;save();render()}}
+else if(t.dataset.i!=null){const v=t.value===''?null:Math.max(0,parseFloat(t.value)||0);setVal(sel,+t.dataset.i,v)}});
+render();
+pull();setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
+</script>
+</body>
+</html>
