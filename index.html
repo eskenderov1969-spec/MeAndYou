@@ -86,49 +86,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .tg{width:100%;height:46px;border-radius:16px;background:var(--card);font-weight:700;font-size:14px;margin-top:12px;box-shadow:0 2px 10px rgba(60,50,130,.12);transition:all .2s}
 .tg.on{background:var(--hc);color:#fff}
 .wkt{display:block;text-align:center;margin-top:8px;color:var(--mute);font-weight:600;font-size:12px}
-.wide{max-width:1240px}
-.wide .seg,.wide .top,.wide .who,.wide .note{max-width:480px;margin-left:auto;margin-right:auto;width:100%}
-.tw{overflow-x:auto;background:var(--card);border-radius:28px;box-shadow:var(--shadow);padding:8px 0 12px}
-.pl{border-collapse:separate;border-spacing:0;font-size:12px;min-width:max-content}
-.pl th,.pl td{padding:3px;text-align:center}
-.pl .sk{position:sticky;left:0;z-index:2;background:var(--card);text-align:left;padding:5px 12px 5px 14px;min-width:152px;box-shadow:8px 0 8px -8px rgba(60,50,130,.18)}
-.pl thead th{font-weight:700;color:var(--mute)}
-.pl th b{display:block;font:600 13px var(--fd);color:var(--text);padding:2px 0;border-radius:10px}
-.pl th small{font-size:10px;font-weight:600}
-.pl th.we b{color:#d9788c}
-.pl th.td b{background:var(--acc);color:#fff}
-.pl td.mo,.pl th.mo{border-left:1px solid color-mix(in srgb,var(--text) 10%,transparent)}
-.pl td.we{background:color-mix(in srgb,var(--text) 3.5%,transparent)}
-.rl{display:flex;align-items:center;gap:10px}
-.pl .ic{width:30px;height:30px;border-radius:10px}
-.pl .ic svg{width:16px;height:16px}
-.pl .ht b{font-size:13px}
-.pl .ht small{font-size:11px}
-.c{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;margin:auto;font-size:13px;font-weight:800;color:#fff;background:color-mix(in srgb,var(--hc,var(--text)) 13%,var(--track));transition:transform .12s}
-.c:active{transform:scale(.88)}
-.c.met{background:var(--hc)}
-.c.part{background:color-mix(in srgb,var(--hc) 38%,var(--card));color:var(--hc)}
-.c.dp{font:600 10px var(--fd);color:var(--text);background:color-mix(in srgb,var(--acc) calc(var(--a)*1%),var(--track))}
-.c.dp.gold{background:var(--goldd);color:#fff}
-.tot{min-width:96px;padding:3px 12px 3px 8px}
-.tot b{display:block;font:600 13px var(--fd)}
-.tot small{font-size:11px;color:var(--mute);font-weight:600}
-.pl tr.sum td{padding-top:10px}
-@media(max-width:560px){.pl .sk{min-width:112px;padding:5px 8px 5px 10px}.pl .ht small{display:none}.pl .rl{gap:8px}.pl .ht b{font-size:12.5px;white-space:normal;line-height:1.2}}
-.sbg{position:fixed;inset:0;background:rgba(30,25,70,.38);z-index:40;border-radius:0;animation:fd .2s}
-.sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-radius:30px 30px 0 0;padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px));z-index:41;box-shadow:0 -10px 40px rgba(30,25,70,.25);animation:up .28s cubic-bezier(.3,.8,.3,1)}
-.sheet h3{margin:0 0 4px;font:600 18px var(--fd)}
-.sheet small{display:block;color:var(--mute);font-weight:600;font-size:13px}
-.sheet .ctl{margin:18px 0 12px}
-.sheet .ctl input{background:var(--cell)}
-.sheet .ctl button{background:var(--cell);box-shadow:none}
-.acts{display:flex;gap:8px}
-.acts button,.sheet .done{flex:1;height:48px;border-radius:16px;font-weight:700;font-size:14px;background:var(--cell)}
-.acts .pri{background:var(--hc);color:#fff}
-.sheet .done{width:100%;margin-top:8px;background:var(--text);color:var(--card)}
-.mode button{font-size:13px}
-@keyframes fd{from{opacity:0}}
-@keyframes up{from{transform:translate(-50%,50px);opacity:0}}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -161,7 +118,7 @@ const MG=['января','февраля','марта','апреля','мая','
 const WD=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 const LS='habits-v2';
 const fresh=()=>({goals:H.map(h=>h.g),days:{}});
-let P={emir:fresh(),saida:fresh()},who='emir',S,showGoals=false,view='table',mode='quick',sheet=null,tblReset=true,syncMsg='Подключение…',refs=null;
+let P={emir:fresh(),saida:fresh()},who='emir',S,showGoals=false,view='track',syncMsg='Подключение…',refs=null;
 try{const t=JSON.parse(localStorage.getItem(LS));if(t){for(const p of PEOPLE)if(t.P&&t.P[p.id]&&t.P[p.id].days)P[p.id]={goals:t.P[p.id].goals||P[p.id].goals,days:t.P[p.id].days};if(t.who&&P[t.who])who=t.who}}catch(e){}
 S=P[who];
 const now=new Date();let vy=now.getFullYear(),vm=now.getMonth();
@@ -197,7 +154,7 @@ if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){const was=pctOf(S,k);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1)setTimeout(burst,80);if(S.days[k].every(x=>x==null))delete S.days[k];save();render()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
-const tabs=()=>`<div class="seg tabs">${[['table','Планер'],['track','День'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
+const tabs=()=>`<div class="seg tabs">${[['track','Планер'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
 function arc(cx,cy,r,sw,p,col,op){const c=2*Math.PI*r;return `<g opacity="${op}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${cx} ${cy})"/>`:''}</g>`}
 function burst(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -215,43 +172,6 @@ return `<div class="h" style="--hc:var(--c4)"><div class="hd"><span class="ic"><
 <button class="tg ${done?'on':''}" data-ty="1">${done?'Занятие отмечено ✓':'Отметить занятие'}</button><span class="wkt">За неделю: ${wc} из ${tg}</span></div>`}
 function tyStat(M){const tg=wg(S),p=Math.min(1,M.ty/(tg*M.nd/7));
 return `<div class="stat"><span>Печать</span><div class="bar" style="--hc:var(--c4)"><i style="width:${p*100}%;background:var(--c4)"></i></div><em>${Math.round(p*100)}%</em></div>`}
-function cellTap(k,i){const cur=(S.days[k]||[])[i];
-if(i===4)return setVal(k,4,cur===1?null:1);
-if(mode==='exact'){sheet={k,i};render();return}
-setVal(k,i,(cur!=null&&cur>=S.goals[i])?null:S.goals[i])}
-function sheetHtml(){if(!sheet)return '';const{k,i}=sheet,h=H[i],v=(S.days[k]||[])[i],a=k.split('-').map(Number);
-return `<button class="sbg" data-sd="1" aria-label="Закрыть"></button><div class="sheet" style="--hc:var(--c${i})"><h3>${h.n}</h3><small>${a[2]} ${MG[a[1]-1]}, цель ${gfmt(i)} ${h.u}</small>
-<div class="ctl"><button data-sa="-1" aria-label="Меньше">−</button><input type="number" inputmode="decimal" step="any" min="0" placeholder="0" data-si="${i}" value="${v==null?'':v}" aria-label="${h.n}"><span>${h.u}</span><button data-sa="1" aria-label="Больше">+</button></div>
-<div class="acts"><button class="pri" data-sg="1">Цель выполнена</button><button data-sc="1">Очистить</button></div><button class="done" data-sd="1">Готово</button></div>`}
-function renderTable(){
-const oldTw=document.querySelector('.tw'),keep=(oldTw&&!tblReset)?oldTw.scrollLeft:null;tblReset=false;
-const D=S,M=monthOf(D),{nd,cnt,full,hd,mp,ty}=M,dn=['вс','пн','вт','ср','чт','пт','сб'],tk=todayK(),tg=wg(D);
-const mo=PEOPLE.map(p=>monthOf(P[p.id]));
-const who_=`<div class="who">${PEOPLE.map((p,ix)=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc};--pd:${p.deep}"><b>${p.n}</b><small>${Math.round(mo[ix].mp*100)}% · ${mo[ix].full} дн. со 100%</small></button>`).join('')}</div>`;
-const cl=d=>{const wd=new Date(vy,vm,d).getDay();return (wd===0||wd===6?'we ':'')+(wd===1&&d>1?'mo':'')};
-let ths='';for(let d=1;d<=nd;d++){const wd=new Date(vy,vm,d).getDay();ths+=`<th class="${cl(d)}"><b class="${key(vy,vm,d)===tk?'td':''}">${d}</b><small>${dn[wd]}</small></th>`}
-const names=['Английский язык','Чтение книги','Ходьба','Сон (минимум)','Учиться печатать'];
-let body='';
-for(let i=0;i<5;i++){
-const goalT=i<4?`${gfmt(i)} ${H[i].u}`:`${tg} ${raz(tg)} в неделю`;
-let tds='';
-for(let d=1;d<=nd;d++){const k=key(vy,vm,d),v=(D.days[k]||[])[i];let c='c',t='';
-if(i<4){if(v!=null){if(v>=D.goals[i]){c+=' met';t='✓'}else{c+=' part';t='•'}}}else if(v===1){c+=' met';t='✓'}
-tds+=`<td class="${cl(d)}"><button class="${c}" data-ck="${k}" data-ci="${i}" aria-label="${names[i]}, ${d}">${t}</button></td>`}
-let tot;if(i<4){const pp=cnt?hd[i]/cnt:0;tot=`<b>${Math.round(pp*100)}%</b><small>${hd[i]} из ${cnt}</small>`}
-else{const pp=Math.min(1,ty/(tg*nd/7));tot=`<b>${Math.round(pp*100)}%</b><small>${ty} ${raz(ty)}</small>`}
-body+=`<tr style="--hc:var(--c${i})"><td class="sk"><div class="rl"><span class="ic"><svg viewBox="0 0 24 24">${i<4?ICONS[i]:KB}</svg></span><div class="ht"><b>${names[i]}</b><small>${goalT}</small></div></div></td>${tds}<td class="tot">${tot}</td></tr>`}
-let dtd='';for(let d=1;d<=nd;d++){const k=key(vy,vm,d),pc=pctOf(D,k);
-dtd+=`<td class="${cl(d)}">${pc==null?'<button class="c" data-hw="'+who+'" data-hk="'+k+'" style="--hc:var(--mute)"></button>':`<button class="c dp ${pc===1?'gold':''}" style="--a:${Math.round(pc*100)}" data-hw="${who}" data-hk="${k}">${Math.round(pc*100)}</button>`}</td>`}
-body+=`<tr class="sum"><td class="sk"><div class="rl"><div class="ht"><b>Прогресс дня</b><small>четыре ежедневные привычки</small></div></div></td>${dtd}<td class="tot"><b>${Math.round(mp*100)}%</b><small>${full} дн. со 100%</small></td></tr>`;
-document.getElementById('app').innerHTML=`${tabs()}
-<div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
-${who_}
-<div class="seg tabs mode"><button data-md="quick" class="${mode==='quick'?'on':''}">Быстрая отметка</button><button data-md="exact" class="${mode==='exact'?'on':''}">Точные значения</button></div>
-<div class="tw"><table class="pl"><thead><tr><th class="sk"></th>${ths}<th class="tot">Итог</th></tr></thead><tbody>${body}</tbody></table></div>
-<div class="note">${mode==='quick'?'Нажми на клетку, чтобы отметить привычку выполненной. Нажми ещё раз, чтобы снять отметку.':'Нажми на клетку, чтобы ввести точное значение.'} Печать отмечается одним нажатием. Нажми на процент внизу, чтобы открыть день.</div>
-<div class="sync">${syncMsg}</div>${sheetHtml()}`;
-const tw=document.querySelector('.tw');if(tw&&keep!=null)tw.scrollLeft=keep;else if(tw&&vy===now.getFullYear()&&vm===now.getMonth()){const cw=tw.clientWidth,lw=cw<700?112:152;tw.scrollLeft=cw<700?Math.max(0,(now.getDate()-4)*36):Math.max(0,lw+now.getDate()*36+40-cw)}}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
@@ -271,9 +191,7 @@ ${rows||'<div class="note">В этом месяце ещё нет дней</div>
 function render(){
 if(!CODE){document.getElementById('app').innerHTML='<div class="card" style="margin-top:18vh;text-align:center"><h2 style="margin:0 0 6px;font-size:19px">Планер</h2><p style="color:var(--mute);font-size:14px;margin:0">Введите код доступа — один раз на этом устройстве</p><div class="ctl" style="margin-top:16px"><input id="code" type="password" autocomplete="off" placeholder="код"><button data-c="1">→</button></div></div>';return}
 const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setProperty('--acc',acc);
-document.getElementById('app').classList.toggle('wide',view==='table');
 if(view==='hist'){renderHist();return}
-if(view==='table'){renderTable();return}
 const M=monthOf(S),{nd,cnt,full,hd,mp}=M,isFull=cnt>0&&mp===1,off=(new Date(vy,vm,1).getDay()+6)%7;
 const mo=PEOPLE.map(p=>monthOf(P[p.id]));let both=0;
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d);if(PEOPLE.every(p=>pctOf(P[p.id],k)===1))both++}
@@ -302,19 +220,13 @@ ${tabs()}
 <div class="sync">${syncMsg}</div><button class="link" data-x="1">Сменить код доступа</button>`}
 const app=document.getElementById('app');
 app.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-if(b.dataset.v){view=b.dataset.v;sheet=null;tblReset=true;render();window.scrollTo(0,0)}
+if(b.dataset.v){view=b.dataset.v;render();window.scrollTo(0,0)}
 else if(b.dataset.hk){who=b.dataset.hw;S=P[who];sel=b.dataset.hk;view='track';save();render();window.scrollTo(0,0)}
-else if(b.dataset.ck){cellTap(b.dataset.ck,+b.dataset.ci)}
-else if(b.dataset.md){mode=b.dataset.md;sheet=null;render()}
-else if(b.dataset.sd){sheet=null;render()}
-else if(b.dataset.sa&&sheet){const i=sheet.i,cur=(S.days[sheet.k]||[])[i]||0;setVal(sheet.k,i,Math.max(0,Math.round((cur+b.dataset.sa*H[i].s)*100)/100))}
-else if(b.dataset.sg&&sheet){setVal(sheet.k,sheet.i,S.goals[sheet.i])}
-else if(b.dataset.sc&&sheet){setVal(sheet.k,sheet.i,null)}
 else if(b.dataset.c){const v=document.getElementById('code').value.trim();if(v){CODE=v;try{localStorage.setItem('habits-code',v)}catch(e){}remote=!!(CFG.url&&CFG.key);render();pull()}}
 else if(b.dataset.x){try{localStorage.removeItem('habits-code')}catch(e){}CODE='';remote=false;render()}
 else if(b.dataset.w){who=b.dataset.w;S=P[who];showGoals=false;save();render()}
 else if(b.dataset.k){sel=b.dataset.k;render()}
-else if(b.dataset.m){tblReset=true;vm+=+b.dataset.m;if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}
+else if(b.dataset.m){vm+=+b.dataset.m;if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}
 sel=(vy===now.getFullYear()&&vm===now.getMonth())?key(vy,vm,now.getDate()):key(vy,vm,1);render()}
 else if(b.dataset.a){const i=+b.dataset.i,cur=(S.days[sel]||[])[i]||0;setVal(sel,i,Math.max(0,Math.round((cur+b.dataset.a*H[i].s)*100)/100))}
 else if(b.dataset.ty){setVal(sel,4,(S.days[sel]||[])[4]===1?null:1)}
@@ -322,7 +234,6 @@ else if(b.dataset.t){showGoals=!showGoals;render()}});
 app.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='code'){const b=document.querySelector('[data-c]');if(b)b.click()}});
 app.addEventListener('change',e=>{const t=e.target;
 if(t.dataset.g!=null){const v=parseFloat(t.value);if(v>0){S.goals[+t.dataset.g]=v;save();render()}}
-else if(t.dataset.si!=null&&sheet){const v=t.value===''?null:Math.max(0,parseFloat(t.value)||0);setVal(sheet.k,sheet.i,v)}
 else if(t.dataset.i!=null){const v=t.value===''?null:Math.max(0,parseFloat(t.value)||0);setVal(sel,+t.dataset.i,v)}});
 render();
 pull();setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
