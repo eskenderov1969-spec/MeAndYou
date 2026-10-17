@@ -89,10 +89,6 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .tg{width:100%;height:46px;border-radius:16px;background:var(--card);font-weight:700;font-size:14px;margin-top:12px;box-shadow:0 2px 10px rgba(60,50,130,.12);transition:all .2s}
 .tg.on{background:var(--hc);color:#fff}
 .wkt{display:block;text-align:center;margin-top:8px;color:var(--mute);font-weight:600;font-size:12px}
-.moods{display:flex;gap:8px;margin:12px 0}
-.mo{flex:1;height:44px;border-radius:14px;background:var(--card);font-size:22px;opacity:.55;transition:all .15s}
-.mo.on{opacity:1;box-shadow:0 0 0 2px var(--hc)}
-.note2{width:100%;min-height:64px;border:0;border-radius:16px;background:var(--card);color:var(--text);padding:12px;font:600 14px "Manrope",sans-serif;resize:vertical}
 .add{display:grid;grid-template-columns:1fr 1fr 84px;gap:8px;margin-top:18px}
 .add input{min-width:0;height:42px;border-radius:14px;border:0;background:var(--cell);color:var(--text);padding:0 12px;font:600 14px "Manrope",sans-serif}
 .add .addb,.del{grid-column:1/-1;height:44px;border-radius:14px;background:var(--acc);color:#fff;font-weight:700;font-size:14px}
@@ -204,8 +200,6 @@ return `<div class="h" style="--hc:var(--c4)"><div class="hd"><span class="ic"><
 <button class="tg ${done?'on':''}" data-ty="1">${done?'Занятие отмечено ✓':'Отметить занятие'}</button><span class="wkt">За неделю: ${wc} из ${tg}</span></div>`}
 function tyStat(M){const tg=wg(S),p=Math.min(1,M.ty/(tg*M.nd/7));
 return `<div class="stat"><span>Печать</span><div class="bar" style="--hc:var(--c4)"><i style="width:${p*100}%;background:var(--c4)"></i></div><em>${Math.round(p*100)}%</em></div>`}
-function moodTile(){const v=S.days[sel]||[],m=v[5];
-return `<div class="h" style="--hc:var(--c3)"><div class="hd"><div class="ht"><b>Настроение и заметка</b><small>как прошёл день</small></div></div><div class="moods">${['😞','😕','😐','🙂','😄'].map((e,j)=>`<button class="mo ${m===j+1?'on':''}" data-mood="${j+1}" aria-label="Настроение ${j+1}">${e}</button>`).join('')}</div><textarea class="note2" data-note="1" maxlength="300" placeholder="Заметка дня…">${esc(v[6]||'')}</textarea></div>`}
 function streaks(fn){const t=new Date(now.getFullYear(),now.getMonth(),now.getDate()),arr=[];
 for(let i=399;i>=0;i--){const x=new Date(t);x.setDate(t.getDate()-i);arr.push(fn(key(x.getFullYear(),x.getMonth(),x.getDate())))}
 let run=0,best=0;arr.forEach(v=>{run=v?run+1:0;best=Math.max(best,run)});
@@ -271,7 +265,7 @@ const sd=sel.split('-').map(Number),dt=new Date(sd[0],sd[1]-1,sd[2]),vals=S.days
 const rows=idxsOf(S).map(i=>{const h=info(S,i),v=vals[i],g=h.g,p=v==null?0:Math.min(v/g,1),ok=v!=null&&v>=g;
 return `<div class="h" style="--hc:var(--c${cc(i)})"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24">${ICONS[i]||ICONS[4]}</svg></span><div class="ht"><b>${h.n}</b><small>цель ${gfmt(i)} ${h.u}</small></div><span class="ok">${ok?'✓':''}</span></div>
 <div class="bar"><i style="width:${p*100}%;background:var(--hc)"></i></div>
-<div class="ctl"><button data-i="${i}" data-a="-1" aria-label="Меньше">−</button><input type="number" inputmode="decimal" step="any" min="0" placeholder="0" data-i="${i}" value="${v==null?'':v}" aria-label="${h.n}"><span>${h.u}</span><button data-i="${i}" data-a="1" aria-label="Больше">+</button></div></div>`}).join('')+typingTile()+moodTile();
+<div class="ctl"><button data-i="${i}" data-a="-1" aria-label="Меньше">−</button><input type="number" inputmode="decimal" step="any" min="0" placeholder="0" data-i="${i}" value="${v==null?'':v}" aria-label="${h.n}"><span>${h.u}</span><button data-i="${i}" data-a="1" aria-label="Больше">+</button></div></div>`}).join('')+typingTile();
 const stats=idxsOf(S).map(i=>{const h=info(S,i),p=cnt?(hd[i]||0)/cnt:0;return `<div class="stat"><span>${h.n.split(' ')[0]}</span><div class="bar" style="--hc:var(--c${cc(i)})"><i style="width:${p*100}%;background:var(--c${cc(i)})"></i></div><em>${Math.round(p*100)}%</em></div>`}).join('')+tyStat(M);
 const goals=H.map((h,i)=>`<span>${h.n}, ${h.u}</span><input type="number" step="any" min="0" data-g="${i}" value="${S.goals[i]}">`).join('')+`<span>Учиться печатать, раз в неделю</span><input type="number" step="1" min="1" max="7" data-g="4" value="${wg(S)}">`+S.custom.map(c=>`<span>${esc(c.n)}, ${esc(c.u)}</span><input type="number" step="any" min="0" data-cg="${c.id}" value="${c.g}">`).join('');
 const addForm=`<div class="add"><input id="cn" placeholder="Название" maxlength="30"><input id="cu" placeholder="Единица" maxlength="10"><input id="cg" type="number" min="0" step="any" placeholder="Цель"><button class="addb" data-add="1">Добавить привычку</button>${S.custom.map(c=>`<button class="del" data-del="${c.id}">Удалить «${esc(c.n)}»</button>`).join('')}</div>`;
@@ -295,7 +289,6 @@ else if(b.dataset.k){sel=b.dataset.k;render()}
 else if(b.dataset.m){vm+=+b.dataset.m;if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}
 sel=(vy===now.getFullYear()&&vm===now.getMonth())?key(vy,vm,now.getDate()):key(vy,vm,1);render()}
 else if(b.dataset.a){const i=+b.dataset.i,cur=(S.days[sel]||[])[i]||0;setVal(sel,i,Math.max(0,Math.round((cur+b.dataset.a*info(S,i).s)*100)/100))}
-else if(b.dataset.mood){const n=+b.dataset.mood;setVal(sel,5,(S.days[sel]||[])[5]===n?null:n)}
 else if(b.dataset.wk){const a=sel.split('-').map(Number),x=new Date(a[0],a[1]-1,a[2]+ +b.dataset.wk);vy=x.getFullYear();vm=x.getMonth();sel=key(vy,vm,x.getDate());render()}
 else if(b.dataset.add){const n=document.getElementById('cn').value.trim(),u=document.getElementById('cu').value.trim()||'раз',g=parseFloat(document.getElementById('cg').value);if(n&&g>0){S.custom.push({id:S.nid++,n,u,g});save();render()}}
 else if(b.dataset.del){const id=+b.dataset.del;if(confirm('Удалить привычку? Записи по ней перестанут учитываться.')){S.custom=S.custom.filter(c=>c.id!==id);save();render()}}
@@ -305,7 +298,6 @@ app.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='code'){con
 app.addEventListener('change',e=>{const t=e.target;
 if(t.dataset.g!=null){const v=parseFloat(t.value);if(v>0){S.goals[+t.dataset.g]=v;save();render()}}
 else if(t.dataset.cg!=null){const v=parseFloat(t.value),c=S.custom.find(x=>x.id===+t.dataset.cg);if(c&&v>0){c.g=v;save();render()}}
-else if(t.dataset.note!=null){setVal(sel,6,t.value.trim()||null)}
 else if(t.dataset.i!=null){const v=t.value===''?null:Math.max(0,parseFloat(t.value)||0);setVal(sel,+t.dataset.i,v)}});
 render();
 pull();setInterval(pull,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
