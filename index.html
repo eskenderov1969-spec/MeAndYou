@@ -306,9 +306,9 @@ g.fillStyle='rgba(255,255,255,.55)';g.font='700 30px '+M;g.fillText('Итоги 
 const cx=[400,680];[1,0].forEach(ix=>{ring(cx[ix],470,170,44,ms[ix].mp,cols[ix]);g.fillStyle='#fff';g.font='600 60px '+F;g.fillText(Math.round(ms[ix].mp*100)+'%',cx[ix],492)});
 PEOPLE.forEach((p,ix)=>{g.fillStyle=cols[ix];g.font='600 44px '+F;g.fillText(p.n,cx[ix],728);g.fillStyle='rgba(255,255,255,.65)';g.font='700 28px '+M;g.fillText(ms[ix].full+' дн. со 100%',cx[ix],774)});
 rr(W/2-230,816,460,66,33,'rgba(245,199,91,.18)');g.fillStyle='#f5c75b';g.font='700 32px '+M;g.fillText('Вместе: '+both+' дн. со 100%',W/2,860);
-const rows=[[0,'Английский'],[1,'Чтение'],[2,'Ходьба'],[3,'Сон'],['t','Печать']];
-rows.forEach((r,j)=>{const y=940+j*70;g.textAlign='left';g.fillStyle='#fff';g.font='700 30px '+M;g.fillText(r[1],90,y+30);
-PEOPLE.forEach((p,ix)=>{const m=ms[ix],v=r[0]==='t'?Math.min(1,m.ty/(wg(P[p.id])*nd/7)):(m.cnt?(m.hd[r[0]]||0)/m.cnt:0),by=y+(ix?26:6);
+const rows=[[0,'Английский'],[1,'Чтение'],[2,'Ходьба'],[3,'Сон'],[30,'Подготовка'],['t','Печать']];
+rows.forEach((r,j)=>{const y=925+j*60;g.textAlign='left';g.fillStyle='#fff';g.font='700 30px '+M;g.fillText(r[1],90,y+30);
+PEOPLE.forEach((p,ix)=>{const m=ms[ix],v=r[0]==='t'?Math.min(1,m.ty/(wg(P[p.id])*nd/7)):((r[0]===30?m.cntp:m.cnt)?(m.hd[r[0]]||0)/(r[0]===30?m.cntp:m.cnt):0),by=y+(ix?26:6);
 rr(330,by,520,16,8,'rgba(255,255,255,.13)');if(v>0)rr(330,by,Math.max(16,520*v),16,8,cols[ix]);
 g.fillStyle='rgba(255,255,255,.8)';g.font='700 24px '+M;g.fillText(Math.round(v*100)+'%',870,by+15)})});
 g.textAlign='center';g.fillStyle='rgba(255,255,255,.35)';g.font='600 28px '+F;g.fillText('Планер',W/2,1310);
