@@ -173,14 +173,15 @@ let sel=todayK();
 const num=n=>String(n).replace('.',',');
 const big=n=>Number(n).toLocaleString('ru-RU').replace(/\u00a0/g,' ');
 const gfmt=i=>{const h=info(S,i);return h.u==='шагов'?big(h.g):num(h.g)};
-const idxsOf=D=>[0,1,2,3,...D.custom.map(c=>7+c.id)];
-const cc=i=>i<4?i:5+(i-7)%3;
+const PREP_FROM='2026-10-18';
+const idxsOf=D=>[0,1,2,3,30,...D.custom.map(c=>7+c.id)];
+const cc=i=>i<4?i:i===30?5:5+(i-7)%3;
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-function info(D,i){if(i<4)return{n:H[i].n,u:H[i].u,g:D.goals[i],s:H[i].s};const c=D.custom.find(x=>x.id===i-7)||{n:'?',u:'',g:1};return{n:c.n,u:c.u,g:c.g,s:c.g>=1000?1000:c.g>=100?100:c.g>=10?1:.5}}
-function pctOf(D,k){const v=D.days[k]||[],ix=idxsOf(D);if(!ix.some(i=>v[i]!=null))return null;return ix.filter(i=>v[i]!=null&&v[i]>=info(D,i).g).length/ix.length}
-function monthOf(D){const nd=new Date(vy,vm+1,0).getDate();let sum=0,cnt=0,full=0,ty=0;const hd={},ix=idxsOf(D);
-for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(D,k);if((D.days[k]||[])[4]===1)ty++;if(p!=null){sum+=p;cnt++;if(p===1)full++;ix.forEach(i=>{const x=D.days[k][i];if(x!=null&&x>=info(D,i).g)hd[i]=(hd[i]||0)+1})}}
-return{nd,cnt,full,hd,ty,mp:cnt?sum/cnt:0}}
+function info(D,i){if(i===30)return{n:'Подготовка к парам',u:'',g:1,s:1};if(i<4)return{n:H[i].n,u:H[i].u,g:D.goals[i],s:H[i].s};const c=D.custom.find(x=>x.id===i-7)||{n:'?',u:'',g:1};return{n:c.n,u:c.u,g:c.g,s:c.g>=1000?1000:c.g>=100?100:c.g>=10?1:.5}}
+function pctOf(D,k){const v=D.days[k]||[],ix=idxsOf(D).filter(i=>i!==30||k>=PREP_FROM);if(!ix.some(i=>v[i]!=null))return null;return ix.filter(i=>v[i]!=null&&v[i]>=info(D,i).g).length/ix.length}
+function monthOf(D){const nd=new Date(vy,vm+1,0).getDate();let sum=0,cnt=0,full=0,ty=0,cntp=0;const hd={},ix=idxsOf(D);
+for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(D,k);if((D.days[k]||[])[4]===1)ty++;if(p!=null){sum+=p;cnt++;if(k>=PREP_FROM)cntp++;if(p===1)full++;ix.forEach(i=>{if(i===30&&k<PREP_FROM)return;const x=D.days[k][i];if(x!=null&&x>=info(D,i).g)hd[i]=(hd[i]||0)+1})}}
+return{nd,cnt,cntp,full,hd,ty,mp:cnt?sum/cnt:0}}
 function ring(p,sz,sw,col){const r=(sz-sw)/2,c=2*Math.PI*r,m=sz/2;
 return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}"><circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${m} ${m})"/>`:''}</svg>`}
 const CFG={url:'https://qffmezdmqmsvunmnzowl.supabase.co',key:'sb_publishable_vovS9yfPQIOAs1xRpLWcRg_rhQgFeMC'};
@@ -214,6 +215,8 @@ const wg=D=>D.goals[4]||3;
 const raz=n=>[2,3,4].includes(n)?'раза':'раз';
 function weekKeys(k){const a=k.split('-').map(Number),dt=new Date(a[0],a[1]-1,a[2]),mon=(dt.getDay()+6)%7;
 return Array.from({length:7},(_,j)=>{const x=new Date(a[0],a[1]-1,a[2]-mon+j);return key(x.getFullYear(),x.getMonth(),x.getDate())})}
+function prepTile(){const done=(S.days[sel]||[])[30]===1;
+return `<div class="h" style="--hc:var(--c5)"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/></svg></span><div class="ht"><b>Подготовка к парам</b><small>отметка раз в день</small></div><span class="ok">${done?'✓':''}</span></div><button class="tg ${done?'on':''}" data-pr="1">${done?'Подготовка сделана ✓':'Отметить подготовку'}</button></div>`}
 function typingTile(){const wk=weekKeys(sel),isOn=k=>(S.days[k]||[])[4]===1,wc=wk.filter(isOn).length,tg=wg(S),done=isOn(sel);
 return `<div class="h" style="--hc:var(--c4)"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24">${KB}</svg></span><div class="ht"><b>Учиться печатать</b><small>цель ${tg} ${raz(tg)} в неделю</small></div><span class="ok">${wc>=tg?'✓':''}</span></div>
 <div class="wk">${wk.map((k,j)=>`<i class="${isOn(k)?'on':''} ${k===sel?'cur':''}">${['П','В','С','Ч','П','С','В'][j]}</i>`).join('')}</div>
@@ -224,7 +227,7 @@ function streaks(fn){const t=new Date(now.getFullYear(),now.getMonth(),now.getDa
 for(let i=399;i>=0;i--){const x=new Date(t);x.setDate(t.getDate()-i);arr.push(fn(key(x.getFullYear(),x.getMonth(),x.getDate())))}
 let run=0,best=0;arr.forEach(v=>{run=v?run+1:0;best=Math.max(best,run)});
 let c=0,i=arr.length-1;if(!arr[i])i--;while(i>=0&&arr[i]){c++;i--}return{cur:c,best}}
-function wsum(D,wk){const ix=idxsOf(D),ps=wk.map(k=>pctOf(D,k)),have=ps.filter(x=>x!=null);if(!have.length)return null;
+function wsum(D,wk){const ix=idxsOf(D).filter(i=>i!==30),ps=wk.map(k=>pctOf(D,k)),have=ps.filter(x=>x!=null);if(!have.length)return null;
 let bi=0;ps.forEach((x,i)=>{if(x!=null&&(ps[bi]==null||x>ps[bi]))bi=i});
 const rate=ix.map(i=>{const n=wk.filter(k=>(D.days[k]||[])[i]!=null);return{i,n:n.length,r:n.length?n.filter(k=>D.days[k][i]>=info(D,i).g).length/n.length:1}}).filter(x=>x.n).sort((a,b)=>a.r-b.r);
 return{avg:have.reduce((a,b)=>a+b,0)/have.length,best:['пн','вт','ср','чт','пт','сб','вс'][bi],full:ps.filter(x=>x===1).length,weak:rate[0]&&rate[0].r<1?info(D,rate[0].i).n:null,ty:wk.filter(k=>(D.days[k]||[])[4]===1).length}}
@@ -247,7 +250,7 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="who">${PEOPLE.map(p=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc};--pd:${p.deep}"><b>${p.n}</b></button>`).join('')}</div>
 <div class="card"><span class="lbl">Серии подряд со 100%</span><div class="stk">${stk.map(x=>`<div class="sb"><b>${x.cur}</b><span>дн. подряд</span><span>рекорд ${x.best}</span></div>`).join('')}</div><div class="note" style="margin:10px 0 0">${stk.map(x=>x.n).join(' · ')}</div></div>
 <div class="card"><span class="lbl">Итоги недели ${f(wk[0])} – ${f(wk[6])}</span><div class="wsm">${wcards}</div><div class="wkn"><button data-wk="-7" aria-label="Прошлая неделя">‹</button><small style="color:var(--mute);font-weight:600">неделя выбранного дня</small><button data-wk="7" aria-label="Следующая неделя">›</button></div></div>
-<div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Тёмный столбик: цель выполнена.</div></div>
+<div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).filter(i=>i!==30).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Тёмный столбик: цель выполнена.</div></div>
 <div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}</div></div>
 <div class="sync">${syncMsg}</div>`}
 function renderHist(){
@@ -255,7 +258,7 @@ const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.ge
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
 const cell=(p,k)=>{const D=P[p.id],v=D.days[k],pc=pctOf(D,k);
 if(pc==null)return `<button class="hc" data-hw="${p.id}" data-hk="${k}"><i>нет данных</i></button>`;
-return `<button class="hc ${pc===1?'full':''}" data-hw="${p.id}" data-hk="${k}"><b>${Math.round(pc*100)}%${pc===1?' ✓':''}</b><span>${v.slice(0,4).map((x,i)=>x==null?'<u>–</u>':`<u class="${x>=D.goals[i]?'ok':''}">${short(i,x)}</u>`).join('')}${v[4]===1?'<u class="ok">⌨</u>':''}</span></button>`};
+return `<button class="hc ${pc===1?'full':''}" data-hw="${p.id}" data-hk="${k}"><b>${Math.round(pc*100)}%${pc===1?' ✓':''}</b><span>${v.slice(0,4).map((x,i)=>x==null?'<u>–</u>':`<u class="${x>=D.goals[i]?'ok':''}">${short(i,x)}</u>`).join('')}${v[4]===1?'<u class="ok">⌨</u>':''}${v[30]===1?'<u class="ok">✎</u>':''}</span></button>`};
 let rows='';for(let d=last;d>=1;d--){const k=key(vy,vm,d);
 rows+=`<div class="hr"><div class="hdt"><b>${d}</b><small>${DW[new Date(vy,vm,d).getDay()]}</small></div>${PEOPLE.map(p=>cell(p,k)).join('')}</div>`}
 const sum=PEOPLE.map(p=>{const m=monthOf(P[p.id]);return `<div class="mini"><div class="ringbox" style="width:64px;height:64px">${ring(m.mp,64,8,p.acc)}<b>${Math.round(m.mp*100)}%</b></div><span>${p.n}: ${m.full} дн. со 100%</span></div>`}).join('');
@@ -282,11 +285,11 @@ let cal=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="d
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(S,k);
 cal+=`<button class="d ${p===1?'full':''} ${(S.days[k]||[])[4]===1?'ty':''} ${k===sel?'sel':''} ${k===todayK()?'today':''}" style="--p:${Math.round((p||0)*100)}%" data-k="${k}"><span>${d}</span></button>`}
 const sd=sel.split('-').map(Number),dt=new Date(sd[0],sd[1]-1,sd[2]),vals=S.days[sel]||[],dp=pctOf(S,sel);
-const rows=idxsOf(S).map(i=>{const h=info(S,i),v=vals[i],g=h.g,p=v==null?0:Math.min(v/g,1),ok=v!=null&&v>=g;
+const rows=idxsOf(S).filter(i=>i!==30).map(i=>{const h=info(S,i),v=vals[i],g=h.g,p=v==null?0:Math.min(v/g,1),ok=v!=null&&v>=g;
 return `<div class="h" style="--hc:var(--c${cc(i)})"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24">${ICONS[i]||ICONS[4]}</svg></span><div class="ht"><b>${h.n}</b><small>цель ${gfmt(i)} ${h.u}</small></div><span class="ok">${ok?'✓':''}</span></div>
 <div class="bar"><i style="width:${p*100}%;background:var(--hc)"></i></div>
-<div class="ctl"><button data-i="${i}" data-a="-1" aria-label="Меньше">−</button><input type="number" inputmode="decimal" step="any" min="0" placeholder="0" data-i="${i}" value="${v==null?'':v}" aria-label="${h.n}"><span>${h.u}</span><button data-i="${i}" data-a="1" aria-label="Больше">+</button></div></div>`}).join('')+typingTile();
-const stats=idxsOf(S).map(i=>{const h=info(S,i),p=cnt?(hd[i]||0)/cnt:0;return `<div class="stat"><span>${h.n.split(' ')[0]}</span><div class="bar" style="--hc:var(--c${cc(i)})"><i style="width:${p*100}%;background:var(--c${cc(i)})"></i></div><em>${Math.round(p*100)}%</em></div>`}).join('')+tyStat(M);
+<div class="ctl"><button data-i="${i}" data-a="-1" aria-label="Меньше">−</button><input type="number" inputmode="decimal" step="any" min="0" placeholder="0" data-i="${i}" value="${v==null?'':v}" aria-label="${h.n}"><span>${h.u}</span><button data-i="${i}" data-a="1" aria-label="Больше">+</button></div></div>`}).join('')+prepTile()+typingTile();
+const stats=idxsOf(S).map(i=>{const h=info(S,i),den=i===30?M.cntp:cnt,p=den?(hd[i]||0)/den:0;return `<div class="stat"><span>${h.n.split(' ')[0]}</span><div class="bar" style="--hc:var(--c${cc(i)})"><i style="width:${p*100}%;background:var(--c${cc(i)})"></i></div><em>${Math.round(p*100)}%</em></div>`}).join('')+tyStat(M);
 const goals=H.map((h,i)=>`<span>${h.n}, ${h.u}</span><input type="number" step="any" min="0" data-g="${i}" value="${S.goals[i]}">`).join('')+`<span>Учиться печатать, раз в неделю</span><input type="number" step="1" min="1" max="7" data-g="4" value="${wg(S)}">`+S.custom.map(c=>`<span>${esc(c.n)}, ${esc(c.u)}</span><input type="number" step="any" min="0" data-cg="${c.id}" value="${c.g}">`).join('');
 const addForm=`<div class="add"><input id="cn" placeholder="Название" maxlength="30"><input id="cu" placeholder="Единица" maxlength="10"><input id="cg" type="number" min="0" step="any" placeholder="Цель"><button class="addb" data-add="1">Добавить привычку</button>${S.custom.map(c=>`<button class="del" data-del="${c.id}">Удалить «${esc(c.n)}»</button>`).join('')}</div>`;
 document.getElementById('app').innerHTML=`
@@ -312,6 +315,7 @@ else if(b.dataset.a){const i=+b.dataset.i,cur=(S.days[sel]||[])[i]||0;setVal(sel
 else if(b.dataset.wk){const a=sel.split('-').map(Number),x=new Date(a[0],a[1]-1,a[2]+ +b.dataset.wk);vy=x.getFullYear();vm=x.getMonth();sel=key(vy,vm,x.getDate());render()}
 else if(b.dataset.add){const n=document.getElementById('cn').value.trim(),u=document.getElementById('cu').value.trim()||'раз',g=parseFloat(document.getElementById('cg').value);if(n&&g>0){S.custom.push({id:S.nid++,n,u,g});save();render()}}
 else if(b.dataset.del){const id=+b.dataset.del;if(confirm('Удалить привычку? Записи по ней перестанут учитываться.')){S.custom=S.custom.filter(c=>c.id!==id);save();render()}}
+else if(b.dataset.pr){setVal(sel,30,(S.days[sel]||[])[30]===1?null:1)}
 else if(b.dataset.ty){setVal(sel,4,(S.days[sel]||[])[4]===1?null:1)}
 else if(b.dataset.t){showGoals=!showGoals;render()}});
 app.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='code'){const b=document.querySelector('[data-c]');if(b)b.click()}});
