@@ -152,6 +152,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 </head>
 <body>
 <div id="splash" aria-hidden="true"><svg viewBox="0 0 160 120"><circle class="tr" cx="62" cy="62" r="40"/><circle class="pg" cx="62" cy="62" r="40" stroke="#7fa6f5" style="--to:55.3" transform="rotate(-90 62 62)"/><circle class="tr" cx="98" cy="62" r="40"/><circle class="pg" cx="98" cy="62" r="40" stroke="#f48fb4" style="--to:15.1;animation-delay:.25s" transform="rotate(-90 98 62)"/><circle class="dot" cx="80" cy="10" r="6"/></svg><h2>Планер</h2><div class="ld"><i></i></div></div>
+<script>try{if(sessionStorage.getItem('sp')){document.getElementById('splash').remove()}else{sessionStorage.setItem('sp','1')}}catch(e){}</script>
 <div class="wrap" id="app"></div>
 <script>
 const H=[{n:'Английский язык',u:'ч',g:1.5,s:.5},{n:'Чтение книги',u:'ч',g:1,s:.5},{n:'Ходьба',u:'шагов',g:8000,s:1000},{n:'Сон (минимум)',u:'ч',g:7,s:.5}];
