@@ -159,6 +159,40 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .skyl span{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-size:13px;font-weight:700}
 .skyl i{width:10px;height:10px;border-radius:50%}
 @media(prefers-reduced-motion:reduce){.tw1,.tw2{animation:none}}
+.tabs button{font-size:12.5px;white-space:nowrap;padding:0 2px}
+.wrbtn{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;padding:18px 20px;border-radius:26px;text-align:left;color:#fff;background:linear-gradient(135deg,#4b3fa8,#c0407a);box-shadow:var(--shadow);transition:transform .15s}
+.wrbtn:active{transform:scale(.98)}
+.wrbtn b{font:600 19px var(--fd)}
+.wrbtn span{font-size:13px;font-weight:600;opacity:.85}
+.wrbtn.alt{background:linear-gradient(135deg,#1f6f8b,#4b3fa8)}
+#wrap{position:fixed;inset:0;z-index:65;color:#fff;display:flex;flex-direction:column;transition:background .4s;user-select:none;-webkit-user-select:none}
+.wr-bars{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:14px;right:14px;display:flex;gap:4px;z-index:5}
+.wr-bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.28)}
+.wr-bars i.a{background:#fff}
+.wr-x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 22px);right:14px;z-index:6;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:22px}
+.wr-s{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:86px 26px 60px;gap:16px;animation:wrin .55s both}
+@keyframes wrin{from{opacity:0;transform:translateY(18px)}}
+.wr-prev,.wr-next{position:absolute;top:70px;bottom:0;background:none;z-index:2;border-radius:0}
+.wr-prev{left:0;width:32%}
+.wr-next{right:0;width:68%}
+.wr-lbl{font-size:16px;font-weight:700;letter-spacing:.05em;opacity:.7}
+.wr-big{font:600 52px/1.08 var(--fd)}
+.wr-huge{font:600 76px/1 var(--fd)}
+.wr-sub{font-size:16px;font-weight:600;opacity:.85}
+.wr-ring{width:240px;height:auto;overflow:visible}
+.wr-cols{display:flex;gap:22px;justify-content:center;width:100%}
+.wr-col{flex:1;display:flex;flex-direction:column;gap:6px;align-items:center;min-width:0}
+.wr-col b{font:600 56px/1.1 var(--fd)}
+.wr-col b.m{font-size:36px}
+.wr-col em{font-style:normal;font-size:14px;font-weight:700;opacity:.8;color:#fff}
+.wr-col .nm{font:600 15px var(--fd);color:#fff;margin-top:4px}
+.wr-tog{padding:12px 22px;border-radius:99px;background:rgba(245,199,91,.22);color:#ffe3a0;font-weight:700;font-size:15px}
+.wr-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.wr-s{position:relative;z-index:3;pointer-events:none}
+.wr-s button{pointer-events:auto}
+.wr-btn{height:50px;padding:0 24px;border-radius:99px;background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:15px}
+.wr-btn.pri{background:#fff;color:#3a2a6e}
+@media(prefers-reduced-motion:reduce){.wr-s{animation:none}}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -234,7 +268,7 @@ if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){const was=pctOf(S,k);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
-const tabs=()=>`<div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
+const tabs=()=>`<div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['wrap','Итоги'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
 function arc(cx,cy,r,sw,p,col,op){const c=2*Math.PI*r;return `<g opacity="${op}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${cx} ${cy})"/>`:''}</g>`}
 function burst(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -325,7 +359,7 @@ return c}
 async function showCard(mk){const c=await (mk||monthCard)(),url=c.toDataURL('image/png');
 const e=document.createElement('div');e.id='mcard';
 e.innerHTML=`<button class="mcbg" data-mx="1" aria-label="Закрыть"></button><div class="mcb"><img src="${url}" alt="Итоги месяца"><div class="row"><button class="pri" data-msave="1">Сохранить</button><button data-mshare="1">Поделиться</button></div><button class="cls" data-mx="1">Закрыть</button></div>`;
-document.body.appendChild(e);e._c=c;e._n=`${mk?'nebo':'planer'}-${MN[vm]}-${vy}.png`}
+document.body.appendChild(e);e._c=c;e._n=`${mk===skyCard?'nebo':mk===wrapCard?'itogi':'planer'}-${MN[vm]}-${vy}.png`}
 document.addEventListener('click',async ev=>{const b=ev.target.closest('#mcard button');if(!b)return;const e=document.getElementById('mcard');
 if(b.dataset.mx){e.remove();return}
 const save=()=>{const a=document.createElement('a');a.href=e._c.toDataURL('image/png');a.download=e._n;document.body.appendChild(a);a.click();a.remove()};
@@ -374,6 +408,72 @@ const L=[[PEOPLE[0].n+' '+D.cnt.blue,SC.blue],[PEOPLE[1].n+' '+D.cnt.pink,SC.pin
 g.font='700 30px Manrope, sans-serif';L.forEach((l,i)=>{const x=W/2+(i-1)*300;g.fillStyle=l[1];g.beginPath();g.arc(x-84,1210,11,0,7);g.fill();g.fillStyle='#fff';g.textAlign='left';g.fillText(l[0],x-62,1221)});
 g.textAlign='center';g.fillStyle='rgba(255,255,255,.35)';g.font='600 28px Unbounded, sans-serif';g.fillText('Планер',W/2,1300);
 return c}
+function runBest(keys,fn){let run=0,best=0;keys.forEach(k=>{const v=fn(k);if(v===null)return;run=v?run+1:0;best=Math.max(best,run)});return best}
+function wrapKeys(type){const out=[],td=new Date(now.getFullYear(),now.getMonth(),now.getDate()),a=type==='year'?new Date(vy,0,1):new Date(vy,vm,1),b=type==='year'?new Date(vy,11,31):new Date(vy,vm+1,0);
+for(let x=new Date(a);x<=b&&x<=td;x.setDate(x.getDate()+1))out.push(key(x.getFullYear(),x.getMonth(),x.getDate()));return out}
+function wrapStats(type){const keys=wrapKeys(type),f=k=>{const a=k.split('-').map(Number);return a[2]+' '+MG[a[1]-1]};
+const per=PEOPLE.map(p=>{const D=P[p.id],ix=idxsOf(D);let n=0,full=0,sum=0,eng=0,rd=0,steps=0,ty=0,prep=0,rest=0;const hit={},tot={};
+keys.forEach(k=>{const v=D.days[k]||[];if(v[40])rest++;if(v[4]===1)ty++;if(v[30]===1&&k>=PREP_FROM)prep++;const pc=pctOf(D,k);if(pc==null)return;n++;sum+=pc;if(pc===1)full++;eng+=v[0]||0;rd+=v[1]||0;steps+=v[2]||0;
+ix.forEach(i=>{if(i===30&&k<PREP_FROM)return;tot[i]=(tot[i]||0)+1;if(v[i]!=null&&v[i]>=info(D,i).g)hit[i]=(hit[i]||0)+1})});
+let bh=null;ix.forEach(i=>{if(!tot[i]||tot[i]<3)return;const r=(hit[i]||0)/tot[i];if(!bh||r>bh.r)bh={r,n:info(D,i).n}});
+return{p,n,full,avg:n?sum/n:0,eng,rd,steps,km:steps*.00075,ty,prep,rest,bh,streak:runBest(keys,k=>(D.days[k]||[])[40]?null:pctOf(D,k)===1)}});
+const tg2=k=>{const st=PEOPLE.map(p=>(P[p.id].days[k]||[])[40]?null:pctOf(P[p.id],k)===1).filter(x=>x!==null);return st.length?st.every(Boolean):null};
+let both=0;keys.forEach(k=>{if(PEOPLE.every(p=>pctOf(P[p.id],k)===1))both++});
+const score=ks=>{const avs=PEOPLE.map(p=>{const a=ks.map(k=>pctOf(P[p.id],k)).filter(v=>v!=null);return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}),ok=avs.filter(v=>v!=null);return ok.length?{sc:ok.reduce((x,y)=>x+y,0)/ok.length,avs}:null};
+let top=null;
+if(type==='year'){for(let m=0;m<12;m++){const r=score(keys.filter(k=>+k.split('-')[1]===m+1));if(r&&(!top||r.sc>top.sc))top={...r,name:MN[m]}}}
+else{const seen={};keys.forEach(k=>{seen[weekKeys(k)[0]]=1});Object.keys(seen).forEach(w=>{const ks=weekKeys(w).filter(k=>keys.includes(k)),r=score(ks);if(r&&(!top||r.sc>top.sc))top={...r,name:f(ks[0])+' – '+f(ks[ks.length-1])}})}
+return{keys,per,both,bestT:runBest(keys,tg2),top,type,T:type==='year'?String(vy):MN[vm]+' '+vy,km:per.reduce((a,x)=>a+x.km,0),eng:per.reduce((a,x)=>a+x.eng,0),rd:per.reduce((a,x)=>a+x.rd,0)}}
+const WBG=['linear-gradient(160deg,#3a3570,#1c1842)','linear-gradient(160deg,#1f6f8b,#0f2a56)','linear-gradient(160deg,#8a2f6b,#3a1250)','linear-gradient(160deg,#c46a2b,#6e2a2a)','linear-gradient(160deg,#1f8f6a,#0e3b4a)','linear-gradient(160deg,#4b3fa8,#1a1450)','linear-gradient(160deg,#a8861f,#4a2f12)','linear-gradient(160deg,#c0407a,#4a1a6e)','linear-gradient(160deg,#2d2866,#0f0c2e)'];
+function buildSlides(st){const pp=st.per,co=['#8fb7ff','#ff9cc0'],n1=v=>num(Math.round(v*10)/10);
+const two=fn=>`<div class="wr-cols">${pp.map((x,i)=>`<div class="wr-col" style="color:${co[i]}">${fn(x,i)}<span class="nm">${x.p.n}</span></div>`).join('')}</div>`;
+const cnt=(v,d,u)=>`<b data-c="${v}" data-d="${d}">0</b>${u?`<em>${u}</em>`:''}`;
+if(!pp.some(x=>x.n))return[{c:WBG[0],h:`<div class="wr-lbl">Итоги</div><div class="wr-big">${st.T}</div><div class="wr-sub">Пока нет данных за этот период</div><button class="wr-btn" data-wx="1">Закрыть</button>`}];
+const avg=pp.reduce((a,x)=>a+x.avg,0)/2,sl=[];
+sl.push(`<div class="wr-lbl">Ваши итоги</div><div class="wr-big">${st.T}</div><svg class="wr-ring" viewBox="0 0 320 170">${arc(102,85,64,15,pp[0].avg,co[0],1)}${arc(218,85,64,15,pp[1].avg,co[1],1)}</svg><div class="wr-sub">Эмир и Саида</div>`);
+sl.push(`<div class="wr-lbl">Дней со 100%</div>${two(x=>cnt(x.full,0,'дн.'))}<div class="wr-tog">Вместе: ${st.both} дн.</div>`);
+if(st.top)sl.push(`<div class="wr-lbl">${st.type==='year'?'Самый сильный месяц':'Самая сильная неделя'}</div><div class="${st.type==='year'?'wr-huge':'wr-big'}">${st.top.name}</div><div class="wr-sub">${Math.round(st.top.sc*100)}% в среднем у вас обоих</div>${two((x,i)=>`<b class="m">${st.top.avs[i]==null?'—':Math.round(st.top.avs[i]*100)+'%'}</b>`)}`);
+sl.push(`<div class="wr-lbl">Лучшая привычка</div>${two(x=>x.bh?`<b class="m">${Math.round(x.bh.r*100)}%</b><em>${esc(x.bh.n)}</em>`:'<b class="m">—</b>')}`);
+sl.push(`<div class="wr-lbl">Английский</div>${two(x=>cnt(Math.round(x.eng*10)/10,1,'часов'))}<div class="wr-tog">Вместе: ${n1(st.eng)} ч</div>`);
+sl.push(`<div class="wr-lbl">Чтение</div>${two(x=>cnt(Math.round(x.rd*10)/10,1,'часов с книгой'))}<div class="wr-tog">Вместе: ${n1(st.rd)} ч</div>`);
+sl.push(`<div class="wr-lbl">Вы прошли вместе</div><div class="wr-huge">${cnt(Math.round(st.km*10)/10,1,'')}</div><div class="wr-sub">километров. Это ${n1(st.km/42.195)} марафона</div>${two(x=>`<b class="m">${n1(x.km)}</b><em>км</em>`)}`);
+sl.push(`<div class="wr-lbl">Самая длинная серия</div>${two(x=>cnt(x.streak,0,'дн. подряд'))}<div class="wr-tog">Вместе: ${st.bestT} дн. подряд</div>`);
+sl.push(`<div class="wr-lbl">Ещё</div>${two(x=>`<b class="m">${x.ty}</b><em>занятий печатью</em><b class="m">${x.prep}</b><em>дней подготовки</em><b class="m">${x.rest}</b><em>дней отдыха</em>`)}`);
+sl.push(`<div class="wr-lbl">Итог</div><div class="wr-huge">${Math.round(avg*100)}%</div><div class="wr-sub">средний прогресс. Вместе ${st.both} дн. со 100%</div><div class="wr-row"><button class="wr-btn pri" data-wsave="1">Сохранить картинкой</button><button class="wr-btn" data-wx="1">Закрыть</button></div>`);
+return sl.map((h,i)=>({c:WBG[i%WBG.length],h}))}
+let WR=null;
+function openWrap(type){const st=wrapStats(type);WR={st,sl:buildSlides(st),i:0};document.body.style.overflow='hidden';drawWrap()}
+function closeWrap(){const e=document.getElementById('wrap');if(e)e.remove();document.body.style.overflow='';WR=null}
+function drawWrap(){let e=document.getElementById('wrap');if(!e){e=document.createElement('div');e.id='wrap';document.body.appendChild(e)}
+const w=WR,s=w.sl[w.i];e.style.background=s.c;
+e.innerHTML=`<div class="wr-bars">${w.sl.map((_,j)=>`<i class="${j<=w.i?'a':''}"></i>`).join('')}</div><button class="wr-x" data-wx="1" aria-label="Закрыть">×</button><div class="wr-s">${s.h}</div><button class="wr-prev" data-wp="1" aria-label="Назад"></button><button class="wr-next" data-wn="1" aria-label="Дальше"></button>`;
+const rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+e.querySelectorAll('[data-c]').forEach(b=>{const to=+b.dataset.c,d=+b.dataset.d,fm=v=>v.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});if(rm){b.textContent=fm(to);return}
+const t0=performance.now(),st=x=>{const q=Math.min(1,(x-t0)/1000);b.textContent=fm(to*(1-Math.pow(1-q,3)));if(q<1)requestAnimationFrame(st)};requestAnimationFrame(st)})}
+const wgo=d=>{if(!WR)return;const n=Math.max(0,Math.min(WR.sl.length-1,WR.i+d));if(n!==WR.i){WR.i=n;drawWrap()}};
+document.addEventListener('click',ev=>{const b=ev.target.closest('#wrap button');if(!b)return;
+if(b.dataset.wx)closeWrap();else if(b.dataset.wp)wgo(-1);else if(b.dataset.wn)wgo(1);else if(b.dataset.wsave)showCard(wrapCard)});
+document.addEventListener('keydown',ev=>{if(!WR||document.getElementById('mcard'))return;if(ev.key==='ArrowRight')wgo(1);else if(ev.key==='ArrowLeft')wgo(-1);else if(ev.key==='Escape')closeWrap()});
+let wx0=null;document.addEventListener('touchstart',ev=>{wx0=WR?ev.touches[0].clientX:null},{passive:true});
+document.addEventListener('touchend',ev=>{if(wx0==null||!WR)return;const dx=ev.changedTouches[0].clientX-wx0;wx0=null;if(Math.abs(dx)>60)wgo(dx<0?1:-1)},{passive:true});
+function renderWrapTab(){
+document.getElementById('app').innerHTML=`${tabs()}
+<div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
+<button class="wrbtn" data-wrap="year"><b>Итоги ${vy} года</b><span>Самый сильный месяц, лучшая привычка, часы, километры и серия</span></button>
+<button class="wrbtn alt" data-wrap="month"><b>Итоги: ${MN[vm].toLowerCase()} ${vy}</b><span>То же самое за выбранный месяц. Листай месяцы стрелками выше</span></button>
+<div class="note" style="margin:0">Листай слайды касанием: вправо дальше, влево назад. В конце можно сохранить картинкой.</div>
+<div class="sync">${syncMsg}</div>`}
+async function wrapCard(){try{await document.fonts.load('600 60px Unbounded');await document.fonts.load('700 30px Manrope')}catch(e){}
+const W=1080,HH=1350,c=document.createElement('canvas');c.width=W;c.height=HH;const g=c.getContext('2d'),st=WR?WR.st:wrapStats('year'),co=['#8fb7ff','#ff9cc0'],F='Unbounded, Manrope, sans-serif',M='Manrope, sans-serif';
+const gr=g.createLinearGradient(0,0,W,HH);gr.addColorStop(0,'#3a3570');gr.addColorStop(1,'#1c1842');g.fillStyle=gr;g.fillRect(0,0,W,HH);
+const fm=(v,d=1)=>v.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
+g.textAlign='center';g.fillStyle='rgba(255,255,255,.6)';g.font='700 30px '+M;g.fillText('Ваши итоги',W/2,130);g.fillStyle='#fff';g.font='600 76px '+F;g.fillText(st.T,W/2,225);
+st.per.forEach((x,i)=>{const cx=300+i*480;g.fillStyle=co[i];g.font='600 46px '+F;g.fillText(x.p.n,cx,350);g.fillStyle='#fff';g.font='700 32px '+M;
+[x.full+' дн. со 100%','Английский: '+fm(x.eng)+' ч','Чтение: '+fm(x.rd)+' ч','Пройдено: '+fm(x.km)+' км','Серия: '+x.streak+' дн.'].forEach((l,j)=>g.fillText(l,cx,430+j*74))});
+g.fillStyle='rgba(245,199,91,.18)';g.beginPath();if(g.roundRect)g.roundRect(90,840,900,330,40);else g.rect(90,840,900,330);g.fill();
+g.fillStyle='#f5c75b';g.font='600 40px '+F;g.fillText('Вместе',W/2,915);g.fillStyle='#ffe3a0';g.font='700 38px '+M;
+[st.both+' дн. со 100%',fm(st.km)+' км пройдено',fm(st.eng+st.rd)+' ч английского и чтения','Серия вместе: '+st.bestT+' дн.'].forEach((l,j)=>g.fillText(l,W/2,985+j*58));
+g.fillStyle='rgba(255,255,255,.4)';g.font='600 30px '+F;g.fillText('Планер',W/2,1290);return c}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
@@ -397,6 +497,7 @@ const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setPrope
 if(view==='hist'){renderHist();return}
 if(view==='stats'){renderStats();return}
 if(view==='sky'){renderSky();return}
+if(view==='wrap'){renderWrapTab();return}
 const M=monthOf(S),{nd,cnt,full,hd,mp}=M,isFull=cnt>0&&mp===1,off=(new Date(vy,vm,1).getDay()+6)%7;
 const mo=PEOPLE.map(p=>monthOf(P[p.id]));let both=0;
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d);if(PEOPLE.every(p=>pctOf(P[p.id],k)===1))both++}
@@ -434,6 +535,7 @@ else if(b.dataset.w){who=b.dataset.w;S=P[who];showGoals=false;const l=document.g
 else if(b.dataset.love){sendLove(b)}
 else if(b.dataset.mc){showCard()}
 else if(b.dataset.sky){showCard(skyCard)}
+else if(b.dataset.wrap){openWrap(b.dataset.wrap)}
 else if(b.dataset.k){sel=b.dataset.k;render()}
 else if(b.dataset.m){vm+=+b.dataset.m;if(vm<0){vm=11;vy--}if(vm>11){vm=0;vy++}
 sel=(vy===now.getFullYear()&&vm===now.getMonth())?key(vy,vm,now.getDate()):key(vy,vm,1);render()}
