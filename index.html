@@ -193,6 +193,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .wr-btn{height:50px;padding:0 24px;border-radius:99px;background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:15px}
 .wr-btn.pri{background:#fff;color:#3a2a6e}
 @media(prefers-reduced-motion:reduce){.wr-s{animation:none}}
+.sec{background:linear-gradient(135deg,#ffe3a0,#f5c75b)!important;color:#6b4a00!important;box-shadow:0 4px 14px rgba(245,199,91,.45)}
+#secret{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:440px;z-index:62;padding:14px 18px;border:0;border-radius:22px;text-align:left;color:#fff;background:linear-gradient(135deg,#4b3fa8,#c0407a);box-shadow:0 14px 36px rgba(75,63,168,.45);animation:rs .5s cubic-bezier(.3,1.4,.5,1)}
+#secret b{display:block;font:600 14px var(--fd)}
+#secret span{display:block;margin-top:4px;font-size:14px;font-weight:700}
+@keyframes rs{from{transform:translate(-50%,90px);opacity:0}}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -265,10 +270,10 @@ if(dirty[p.id]){push(p.id);continue}
 if(r&&r.days){const n={goals:r.goals||P[p.id].goals,days:r.days,custom:r.custom||[],nid:r.nid||0,v2:r.v2};const mg=fixD(n);if(JSON.stringify(n)!==JSON.stringify(P[p.id])){P[p.id]=n;changed=true}
 if(mg){dirty[p.id]=1;push(p.id)}}
 else if(Object.keys(P[p.id].days).length){dirty[p.id]=1;push(p.id)}}
-S=P[who];if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
+S=P[who];checkSecrets(true);if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
 if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
-function setVal(k,i,v){const was=pctOf(S,k);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render()}
+function setVal(k,i,v){const was=pctOf(S,k);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render();checkSecrets()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
 const tabs=()=>`<div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
@@ -320,7 +325,7 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="card"><span class="lbl">Серии подряд со 100%</span><div class="stk">${stk.map(x=>`<div class="sb"><b>${x.cur}</b><span>дн. подряд</span><span>рекорд ${x.best}</span></div>`).join('')}</div><div class="note" style="margin:10px 0 0">${stk.map(x=>x.n).join(' · ')}</div></div>
 <div class="card"><span class="lbl">Итоги недели ${f(wk[0])} – ${f(wk[6])}</span><div class="wsm">${wcards}</div><div class="wkn"><button data-wk="-7" aria-label="Прошлая неделя">‹</button><small style="color:var(--mute);font-weight:600">неделя выбранного дня</small><button data-wk="7" aria-label="Следующая неделя">›</button></div></div>
 <div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).filter(i=>i!==30).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Тёмный столбик: цель выполнена.</div></div>
-<div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}</div></div>
+<div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}${secChips(D)}</div>${secNote(D)}</div>
 <div class="sync">${syncMsg}</div>`}
 const buzz=()=>{try{navigator.vibrate&&navigator.vibrate([50,40,90])}catch(e){}};
 const loveBtn=()=>{const o=PEOPLE.find(p=>p.id!==who);return `<button class="lovebtn" data-love="1">❤ Отправить сердечко ${o.dat}</button>`};
@@ -469,6 +474,27 @@ g.fillStyle='rgba(245,199,91,.18)';g.beginPath();if(g.roundRect)g.roundRect(90,8
 g.fillStyle='#f5c75b';g.font='600 40px '+F;g.fillText('Вместе',W/2,915);g.fillStyle='#ffe3a0';g.font='700 38px '+M;
 [st.both+' дн. со 100%',fm(st.km)+' км пройдено',fm(st.eng,0)+' уроков, '+fm(st.rd)+' ч чтения','Серия вместе: '+st.bestT+' дн.'].forEach((l,j)=>g.fillText(l,W/2,985+j*58));
 g.fillStyle='rgba(255,255,255,.4)';g.font='600 30px '+F;g.fillText('Планер',W/2,1290);return c}
+const rs=(D,k)=>(D.days[k]||[])[40];
+function weeksOf(D){const ks=Object.keys(D.days).sort();if(!ks.length)return[];const a=weekKeys(ks[0])[0].split('-').map(Number),b=weekKeys(ks[ks.length-1])[0],out=[];
+for(let d=new Date(a[0],a[1]-1,a[2]);;d.setDate(d.getDate()+7)){const w=key(d.getFullYear(),d.getMonth(),d.getDate());out.push(weekKeys(w));if(w>=b)break}return out}
+const SEC=[
+['sun','🌅','Пять воскресений подряд',D=>runBest(weeksOf(D).map(w=>w[6]),k=>rs(D,k)?null:pctOf(D,k)===1)>=5],
+['sleep','😴','Неделя крепкого сна',D=>weeksOf(D).some(w=>w.every(k=>{const v=(D.days[k]||[])[3];return v!=null&&v>=D.goals[3]}))],
+['perfw','✨','Идеальная неделя',D=>weeksOf(D).some(w=>w.every(k=>!rs(D,k)&&pctOf(D,k)===1))],
+['10k','🚀','Десять тысяч шагов за день',D=>Object.values(D.days).some(v=>(v[2]||0)>=10000)],
+['duo3','🎓','Три урока за день',D=>Object.values(D.days).some(v=>(v[0]||0)>=3)],
+['type4','⌨️','Печатная машинка',D=>weeksOf(D).some(w=>w.filter(k=>(D.days[k]||[])[4]===1).length>=4)],
+['wknd','🌗','Идеальные выходные',D=>weeksOf(D).some(w=>pctOf(D,w[5])===1&&pctOf(D,w[6])===1)],
+['nogap','🧩','Месяц без пропусков',D=>{const ms={};Object.keys(D.days).forEach(k=>{ms[k.slice(0,7)]=1});return Object.keys(ms).some(m=>{const[y,mo]=m.split('-').map(Number);if(y===now.getFullYear()&&mo===now.getMonth()+1)return false;const nd=new Date(y,mo,0).getDate();for(let d=1;d<=nd;d++){const k=key(y,mo-1,d);if(pctOf(D,k)==null&&!rs(D,k))return false}return true})}],
+['tog10','🤝','Десять дней вместе',()=>Object.keys(P.emir.days).filter(k=>PEOPLE.every(p=>pctOf(P[p.id],k)===1)).length>=10]];
+const secOpen=D=>SEC.filter(x=>x[3](D));
+const secChips=D=>secOpen(D).map(x=>`<span class="sec">${x[1]} ${x[2]}</span>`).join('');
+const secNote=D=>{const n=SEC.length-secOpen(D).length;return n?`<div class="note" style="margin:10px 0 0">Секретных достижений ещё не открыто: ${n}</div>`:''};
+function toast(h){let e=document.getElementById('secret');if(!e){e=document.createElement('button');e.id='secret';document.body.appendChild(e);e.onclick=()=>e.remove()}e.innerHTML=h;clearTimeout(e._t);e._t=setTimeout(()=>e.remove(),6000)}
+function checkSecrets(silent){if(!CODE)return;const ids=secOpen(S).map(x=>x[0]);let old=null;try{old=JSON.parse(localStorage.getItem('sec-'+who))}catch(e){}
+try{localStorage.setItem('sec-'+who,JSON.stringify(ids))}catch(e){}
+if(silent||old===null)return;const nw=ids.filter(i=>!old.includes(i));
+if(nw.length){const x=SEC.find(y=>y[0]===nw[0]);toast(`<b>Секретное достижение!</b><span>${x[1]} ${x[2]}</span>`);buzz()}}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
@@ -549,6 +575,11 @@ if(t.dataset.g!=null){const v=parseFloat(t.value);if(v>0){S.goals[+t.dataset.g]=
 else if(t.dataset.cg!=null){const v=parseFloat(t.value),c=S.custom.find(x=>x.id===+t.dataset.cg);if(c&&v>0){c.g=v;save();render()}}
 else if(t.dataset.i!=null){const v=t.value===''?null:Math.max(0,parseFloat(t.value)||0);setVal(sel,+t.dataset.i,v)}});
 render();
+checkSecrets(true);
+(()=>{const q=new URLSearchParams(location.search).get('a');if(!q)return;try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
+if(!CODE)return;
+if(q==='prep'){sel=todayK();view='track';if((S.days[sel]||[])[30]!==1)setVal(sel,30,1);else render();toast('<b>Подготовка к парам</b><span>Отмечено на сегодня ✓</span>')}
+else if(q==='sky'){view='sky';render()}})();
 const t0=Date.now(),first=pull();setInterval(pull,30000);
 Promise.race([first,new Promise(r=>setTimeout(r,4000))]).catch(()=>{}).then(()=>setTimeout(()=>{const e=document.getElementById('splash');if(e){e.classList.add('out');setTimeout(()=>e.remove(),700)}},Math.max(0,1500-(Date.now()-t0))));document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
 </script>
