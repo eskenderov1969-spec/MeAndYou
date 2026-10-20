@@ -220,16 +220,17 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 <script>try{if(sessionStorage.getItem('sp')){document.getElementById('splash').remove()}else{sessionStorage.setItem('sp','1')}}catch(e){}</script>
 <div class="wrap" id="app"></div>
 <script>
-const H=[{n:'Английский язык',u:'ч',g:1.5,s:.5},{n:'Чтение книги',u:'ч',g:1,s:.5},{n:'Ходьба',u:'шагов',g:8000,s:1000},{n:'Сон (минимум)',u:'ч',g:7,s:.5}];
+const H=[{n:'Английский в Duolingo',u:'урок',g:1,s:1},{n:'Чтение книги',u:'ч',g:1,s:.5},{n:'Ходьба',u:'шагов',g:8000,s:1000},{n:'Сон (минимум)',u:'ч',g:7,s:.5}];
 const PEOPLE=[{id:'emir',n:'Эмир',dat:'Эмиру',acc:'#8fb4ec',deep:'#4a82f0'},{id:'saida',n:'Саида',dat:'Саиде',acc:'#f0a9c6',deep:'#ea5a90'}];
 const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const MG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const WD=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
 const LS='habits-v2';
-const fresh=()=>({goals:H.map(h=>h.g),days:{},custom:[],nid:0});
+const fresh=()=>({goals:H.map(h=>h.g),days:{},custom:[],nid:0,v2:1});
+const fixD=D=>{if(!D.v2){D.goals[0]=1;D.v2=1;return true}return false};
 let P={emir:fresh(),saida:fresh()},who='emir',S,showGoals=false,view='track',syncMsg='Подключение…',refs=null;
-try{const t=JSON.parse(localStorage.getItem(LS));if(t){for(const p of PEOPLE)if(t.P&&t.P[p.id]&&t.P[p.id].days)P[p.id]={goals:t.P[p.id].goals||P[p.id].goals,days:t.P[p.id].days,custom:t.P[p.id].custom||[],nid:t.P[p.id].nid||0};if(t.who&&P[t.who])who=t.who}}catch(e){}
-S=P[who];
+try{const t=JSON.parse(localStorage.getItem(LS));if(t){for(const p of PEOPLE)if(t.P&&t.P[p.id]&&t.P[p.id].days)P[p.id]={goals:t.P[p.id].goals||P[p.id].goals,days:t.P[p.id].days,custom:t.P[p.id].custom||[],nid:t.P[p.id].nid||0,v2:t.P[p.id].v2};if(t.who&&P[t.who])who=t.who}}catch(e){}
+PEOPLE.forEach(p=>fixD(P[p.id]));S=P[who];
 const now=new Date();let vy=now.getFullYear(),vm=now.getMonth();
 const pad=n=>String(n).padStart(2,'0');
 const key=(y,m,d)=>y+'-'+pad(m+1)+'-'+pad(d);
@@ -255,20 +256,21 @@ let CODE='';try{CODE=localStorage.getItem('habits-code')||''}catch(e){}
 let remote=!!(CFG.url&&CFG.key&&CODE);const dirty={},tms={};
 async function rpc(fn,body){const r=await fetch(CFG.url.replace(/\/rest\/v1\/?$/,'').replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:Object.assign({'Content-Type':'application/json',apikey:CFG.key},CFG.key.startsWith('sb_')?{}:{Authorization:'Bearer '+CFG.key}),body:JSON.stringify(body)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null}
 const setSync=m=>{syncMsg=m;const e=document.querySelector('.sync');if(e)e.textContent=m};
-function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(async()=>{try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:{goals:P[w].goals,days:P[w].days,custom:P[w].custom,nid:P[w].nid}});delete dirty[w];setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — сохранено на устройстве, отправится позже')}},500)}
+function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(async()=>{try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:{goals:P[w].goals,days:P[w].days,custom:P[w].custom,nid:P[w].nid,v2:P[w].v2}});delete dirty[w];setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — сохранено на устройстве, отправится позже')}},500)}
 function save(w=who){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
 if(remote){dirty[w]=1;push(w)}}
 async function pull(){if(!remote)return;let changed=false;
 try{for(const p of PEOPLE){const r=await rpc('get_tracker',{p_code:CODE+':'+p.id});
 if(dirty[p.id]){push(p.id);continue}
-if(r&&r.days){const n={goals:r.goals||P[p.id].goals,days:r.days,custom:r.custom||[],nid:r.nid||0};if(JSON.stringify(n)!==JSON.stringify(P[p.id])){P[p.id]=n;changed=true}}
+if(r&&r.days){const n={goals:r.goals||P[p.id].goals,days:r.days,custom:r.custom||[],nid:r.nid||0,v2:r.v2};const mg=fixD(n);if(JSON.stringify(n)!==JSON.stringify(P[p.id])){P[p.id]=n;changed=true}
+if(mg){dirty[p.id]=1;push(p.id)}}
 else if(Object.keys(P[p.id].days).length){dirty[p.id]=1;push(p.id)}}
 S=P[who];if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
 if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){const was=pctOf(S,k);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
-const tabs=()=>`<div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['wrap','Итоги'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
+const tabs=()=>`<div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
 function arc(cx,cy,r,sw,p,col,op){const c=2*Math.PI*r;return `<g opacity="${op}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${cx} ${cy})"/>`:''}</g>`}
 function burst(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -434,7 +436,7 @@ sl.push(`<div class="wr-lbl">Ваши итоги</div><div class="wr-big">${st.T
 sl.push(`<div class="wr-lbl">Дней со 100%</div>${two(x=>cnt(x.full,0,'дн.'))}<div class="wr-tog">Вместе: ${st.both} дн.</div>`);
 if(st.top)sl.push(`<div class="wr-lbl">${st.type==='year'?'Самый сильный месяц':'Самая сильная неделя'}</div><div class="${st.type==='year'?'wr-huge':'wr-big'}">${st.top.name}</div><div class="wr-sub">${Math.round(st.top.sc*100)}% в среднем у вас обоих</div>${two((x,i)=>`<b class="m">${st.top.avs[i]==null?'—':Math.round(st.top.avs[i]*100)+'%'}</b>`)}`);
 sl.push(`<div class="wr-lbl">Лучшая привычка</div>${two(x=>x.bh?`<b class="m">${Math.round(x.bh.r*100)}%</b><em>${esc(x.bh.n)}</em>`:'<b class="m">—</b>')}`);
-sl.push(`<div class="wr-lbl">Английский</div>${two(x=>cnt(Math.round(x.eng*10)/10,1,'часов'))}<div class="wr-tog">Вместе: ${n1(st.eng)} ч</div>`);
+sl.push(`<div class="wr-lbl">Английский</div>${two(x=>cnt(Math.round(x.eng),0,'уроков'))}<div class="wr-tog">Вместе: ${Math.round(st.eng)} уроков</div>`);
 sl.push(`<div class="wr-lbl">Чтение</div>${two(x=>cnt(Math.round(x.rd*10)/10,1,'часов с книгой'))}<div class="wr-tog">Вместе: ${n1(st.rd)} ч</div>`);
 sl.push(`<div class="wr-lbl">Вы прошли вместе</div><div class="wr-huge">${cnt(Math.round(st.km*10)/10,1,'')}</div><div class="wr-sub">километров. Это ${n1(st.km/42.195)} марафона</div>${two(x=>`<b class="m">${n1(x.km)}</b><em>км</em>`)}`);
 sl.push(`<div class="wr-lbl">Самая длинная серия</div>${two(x=>cnt(x.streak,0,'дн. подряд'))}<div class="wr-tog">Вместе: ${st.bestT} дн. подряд</div>`);
@@ -456,23 +458,16 @@ if(b.dataset.wx)closeWrap();else if(b.dataset.wp)wgo(-1);else if(b.dataset.wn)wg
 document.addEventListener('keydown',ev=>{if(!WR||document.getElementById('mcard'))return;if(ev.key==='ArrowRight')wgo(1);else if(ev.key==='ArrowLeft')wgo(-1);else if(ev.key==='Escape')closeWrap()});
 let wx0=null;document.addEventListener('touchstart',ev=>{wx0=WR?ev.touches[0].clientX:null},{passive:true});
 document.addEventListener('touchend',ev=>{if(wx0==null||!WR)return;const dx=ev.changedTouches[0].clientX-wx0;wx0=null;if(Math.abs(dx)>60)wgo(dx<0?1:-1)},{passive:true});
-function renderWrapTab(){
-document.getElementById('app').innerHTML=`${tabs()}
-<div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
-<button class="wrbtn" data-wrap="year"><b>Итоги ${vy} года</b><span>Самый сильный месяц, лучшая привычка, часы, километры и серия</span></button>
-<button class="wrbtn alt" data-wrap="month"><b>Итоги: ${MN[vm].toLowerCase()} ${vy}</b><span>То же самое за выбранный месяц. Листай месяцы стрелками выше</span></button>
-<div class="note" style="margin:0">Листай слайды касанием: вправо дальше, влево назад. В конце можно сохранить картинкой.</div>
-<div class="sync">${syncMsg}</div>`}
 async function wrapCard(){try{await document.fonts.load('600 60px Unbounded');await document.fonts.load('700 30px Manrope')}catch(e){}
 const W=1080,HH=1350,c=document.createElement('canvas');c.width=W;c.height=HH;const g=c.getContext('2d'),st=WR?WR.st:wrapStats('year'),co=['#8fb7ff','#ff9cc0'],F='Unbounded, Manrope, sans-serif',M='Manrope, sans-serif';
 const gr=g.createLinearGradient(0,0,W,HH);gr.addColorStop(0,'#3a3570');gr.addColorStop(1,'#1c1842');g.fillStyle=gr;g.fillRect(0,0,W,HH);
 const fm=(v,d=1)=>v.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
 g.textAlign='center';g.fillStyle='rgba(255,255,255,.6)';g.font='700 30px '+M;g.fillText('Ваши итоги',W/2,130);g.fillStyle='#fff';g.font='600 76px '+F;g.fillText(st.T,W/2,225);
 st.per.forEach((x,i)=>{const cx=300+i*480;g.fillStyle=co[i];g.font='600 46px '+F;g.fillText(x.p.n,cx,350);g.fillStyle='#fff';g.font='700 32px '+M;
-[x.full+' дн. со 100%','Английский: '+fm(x.eng)+' ч','Чтение: '+fm(x.rd)+' ч','Пройдено: '+fm(x.km)+' км','Серия: '+x.streak+' дн.'].forEach((l,j)=>g.fillText(l,cx,430+j*74))});
+[x.full+' дн. со 100%','Английский: '+fm(x.eng,0)+' ур.','Чтение: '+fm(x.rd)+' ч','Пройдено: '+fm(x.km)+' км','Серия: '+x.streak+' дн.'].forEach((l,j)=>g.fillText(l,cx,430+j*74))});
 g.fillStyle='rgba(245,199,91,.18)';g.beginPath();if(g.roundRect)g.roundRect(90,840,900,330,40);else g.rect(90,840,900,330);g.fill();
 g.fillStyle='#f5c75b';g.font='600 40px '+F;g.fillText('Вместе',W/2,915);g.fillStyle='#ffe3a0';g.font='700 38px '+M;
-[st.both+' дн. со 100%',fm(st.km)+' км пройдено',fm(st.eng+st.rd)+' ч английского и чтения','Серия вместе: '+st.bestT+' дн.'].forEach((l,j)=>g.fillText(l,W/2,985+j*58));
+[st.both+' дн. со 100%',fm(st.km)+' км пройдено',fm(st.eng,0)+' уроков, '+fm(st.rd)+' ч чтения','Серия вместе: '+st.bestT+' дн.'].forEach((l,j)=>g.fillText(l,W/2,985+j*58));
 g.fillStyle='rgba(255,255,255,.4)';g.font='600 30px '+F;g.fillText('Планер',W/2,1290);return c}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
@@ -486,6 +481,8 @@ rows+=`<div class="hr"><div class="hdt"><b>${d}</b><small>${DW[new Date(vy,vm,d)
 const sum=PEOPLE.map(p=>{const m=monthOf(P[p.id]);return `<div class="mini"><div class="ringbox" style="width:64px;height:64px">${ring(m.mp,64,8,p.acc)}<b>${Math.round(m.mp*100)}%</b></div><span>${p.n}: ${m.full} дн. со 100%</span></div>`}).join('');
 document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><button class="nav" data-m="-1">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1">›</button></div>
+<button class="wrbtn" data-wrap="year"><b>Итоги ${vy} года</b><span>Самый сильный месяц, лучшая привычка, уроки, километры и серия</span></button>
+<button class="wrbtn alt" data-wrap="month"><b>Итоги: ${MN[vm].toLowerCase()} ${vy}</b><span>То же за выбранный месяц. Листай месяцы стрелками выше</span></button>
 <div class="card"><span class="lbl" style="display:block;margin-bottom:12px">Итоги месяца</span><div class="duo">${sum}</div></div>
 <div><div class="hr"><div></div>${PEOPLE.map(p=>`<div class="hn"><span class="dot" style="background:${p.acc}"></span>${p.n}</div>`).join('')}</div>
 <div class="note">Порядок: английский, чтение, шаги, сон. Зелёным выделена выполненная цель. Нажми на день, чтобы открыть его в планере.</div>
@@ -497,7 +494,6 @@ const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setPrope
 if(view==='hist'){renderHist();return}
 if(view==='stats'){renderStats();return}
 if(view==='sky'){renderSky();return}
-if(view==='wrap'){renderWrapTab();return}
 const M=monthOf(S),{nd,cnt,full,hd,mp}=M,isFull=cnt>0&&mp===1,off=(new Date(vy,vm,1).getDay()+6)%7;
 const mo=PEOPLE.map(p=>monthOf(P[p.id]));let both=0;
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d);if(PEOPLE.every(p=>pctOf(P[p.id],k)===1))both++}
