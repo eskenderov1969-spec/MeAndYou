@@ -198,6 +198,25 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 #secret b{display:block;font:600 14px var(--fd)}
 #secret span{display:block;margin-top:4px;font-size:14px;font-weight:700}
 @keyframes rs{from{transform:translate(-50%,90px);opacity:0}}
+.mascot{display:flex;align-items:center;gap:12px}
+.mc-heart{flex:none;width:104px;height:114px;background:none;padding:0}
+.mc-heart svg{width:100%;height:100%;overflow:visible}
+.mc-bubble{position:relative;flex:1;padding:12px 14px;border-radius:20px;background:var(--card);box-shadow:var(--shadow);font-size:14px;font-weight:700;line-height:1.35}
+.mc-bubble::before{content:"";position:absolute;left:-6px;top:30px;width:14px;height:14px;background:var(--card);transform:rotate(45deg);border-radius:3px}
+.mc-bubble small{display:block;color:var(--mute);font-size:11px;font-weight:700;margin-bottom:3px}
+.hb-idle{animation:hfl 3.2s ease-in-out infinite}
+.hb-happy{animation:hjump .75s ease-in-out infinite}
+.hb-tap{animation:hjump .6s ease-in-out 2}
+.hb-sleep{animation:hsl 4s ease-in-out infinite}
+.hb-miss{animation:hsw 4.5s ease-in-out infinite}
+.hz{animation:hz 2.4s ease-in-out infinite}
+.hs{animation:tw 1.8s ease-in-out infinite}
+@keyframes hfl{50%{transform:translateY(-4px)}}
+@keyframes hjump{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}}
+@keyframes hsl{50%{transform:translateY(3px)}}
+@keyframes hsw{50%{transform:translateX(3px)}}
+@keyframes hz{0%{opacity:0;transform:translateY(6px)}50%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+@media(prefers-reduced-motion:reduce){.hb-idle,.hb-happy,.hb-tap,.hb-sleep,.hb-miss,.hz,.hs{animation:none}}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -495,6 +514,42 @@ function checkSecrets(silent){if(!CODE)return;const ids=secOpen(S).map(x=>x[0]);
 try{localStorage.setItem('sec-'+who,JSON.stringify(ids))}catch(e){}
 if(silent||old===null)return;const nw=ids.filter(i=>!old.includes(i));
 if(nw.length){const x=SEC.find(y=>y[0]===nw[0]);toast(`<b>Секретное достижение!</b><span>${x[1]} ${x[2]}</span>`);buzz()}}
+const HCOL=[['#ff9fb5','#f0587d'],['#ff8fab','#e63e6d'],['#ffa6c9','#ec6aa5'],['#ffa3b8','#f0627f'],['#ff9ec4','#e8589a'],['#ff9aa8','#f0506b'],['#ff9bb0','#e94a69'],['#ffa8b9','#e8607a'],['#ff9fb2','#d9566f'],['#ff9db0','#e8506a'],['#f79ac0','#c9457f'],['#ff8f9f','#d63a55']];
+const HACC=['<path d="M34 24Q60-10 86 24Z" fill="#6fb3ff"/><rect x="32" y="22" width="56" height="8" rx="4" fill="#fff"/><circle cx="60" cy="-4" r="6" fill="#fff"/>',
+'<path d="M30 80Q60 96 90 80L88 90Q60 106 32 90Z" fill="#ff6b81"/><rect x="76" y="88" width="11" height="20" rx="4" fill="#ff6b81"/>',
+'<g fill="#fff"><circle cx="54" cy="7" r="5"/><circle cx="66" cy="7" r="5"/><circle cx="54" cy="17" r="5"/><circle cx="66" cy="17" r="5"/></g><circle cx="60" cy="12" r="4.5" fill="#ffd166"/>',
+'<path d="M28 18Q60-14 92 18Q76 10 60 18Q44 10 28 18Z" fill="#8fb7ff"/><path d="M60 18V4" stroke="#4a5aa8" stroke-width="2"/>',
+'<path d="M60 18L42 6V30ZM60 18L78 6V30Z" fill="#ffb3c6"/><circle cx="60" cy="18" r="4.5" fill="#ff7a9a"/>',
+'<rect x="31" y="45" width="26" height="15" rx="6" fill="#2b2650"/><rect x="63" y="45" width="26" height="15" rx="6" fill="#2b2650"/><path d="M57 52H63" stroke="#2b2650" stroke-width="2.5"/>',
+'<ellipse cx="60" cy="18" rx="42" ry="7" fill="#f2cf7a"/><path d="M40 18Q60-8 80 18Z" fill="#f2cf7a"/><rect x="40" y="13" width="40" height="4" fill="#e07a5f"/>',
+'<path d="M22 50Q22 10 60 10Q98 10 98 50" stroke="#2b2650" stroke-width="5" fill="none"/><rect x="15" y="44" width="13" height="22" rx="5" fill="#8b7cf0"/><rect x="92" y="44" width="13" height="22" rx="5" fill="#8b7cf0"/>',
+'<path d="M60 2L100 17L60 32L20 17Z" fill="#2b2650"/><path d="M40 24V34Q60 42 80 34V24" fill="#3a3570"/><path d="M100 17V34" stroke="#f5c75b" stroke-width="2"/><circle cx="100" cy="36" r="3" fill="#f5c75b"/>',
+'<path d="M60 2L64 11L73 8L69 17L76 21L65 22L60 30L55 22L44 21L51 17L47 8L56 11Z" fill="#e07a3a"/>',
+'<path d="M34 24Q60-10 86 24Z" fill="#c0407a"/><rect x="32" y="22" width="56" height="8" rx="4" fill="#ffd1e0"/><circle cx="60" cy="-4" r="6" fill="#ffd1e0"/>',
+'<path d="M34 24Q48-10 86 6Q76 14 86 24Z" fill="#e5383b"/><rect x="32" y="22" width="56" height="8" rx="4" fill="#fff"/><circle cx="88" cy="6" r="6" fill="#fff"/>'];
+let heartN=0,heartTap=false;
+function heartHtml(){const D=S,tk=todayK(),v=D.days[tk]||[],pc=pctOf(D,tk),both=PEOPLE.every(p=>pctOf(P[p.id],tk)===1),m=now.getMonth(),[c1,c2]=HCOL[m];
+const n=idxsOf(D).filter(i=>i!==30||tk>=PREP_FROM).length,met=Math.round((pc||0)*n);
+const st=v[40]?'sleep':pc===1?'happy':pc!=null?'part':'miss',pick=a=>a[heartN%a.length];
+const msg={happy:both?['Вы оба закрыли день! Я такой счастливый','Двойная победа сегодня!']:['Ура! Всё выполнено! Горжусь тобой','Вот это день! Я прыгаю от радости'],
+part:[`Уже ${met} из ${n}. Ещё чуть-чуть, я рядом`,'Хорошее начало! Я верю в тебя'],
+miss:['Привет! Я скучаю. Загляни ко мне, когда будет минутка','Я никуда не спешу. Отметишь что-нибудь сегодня?'],
+sleep:[v[40]==='sick'?'Отдыхай и выздоравливай. Я посплю рядом':'Выходной. Самое время поспать','Тсс… Мы отдыхаем']}[st];
+const eyes={happy:'<path d="M37 55Q44 45 51 55M69 55Q76 45 83 55" stroke="#4a1d34" stroke-width="3.5" fill="none" stroke-linecap="round"/>',
+sleep:'<path d="M37 53Q44 59 51 53M69 53Q76 59 83 53" stroke="#4a1d34" stroke-width="3.5" fill="none" stroke-linecap="round"/>',
+part:'<circle cx="44" cy="53" r="4.5" fill="#4a1d34"/><circle cx="76" cy="53" r="4.5" fill="#4a1d34"/><circle cx="45.5" cy="51.5" r="1.4" fill="#fff"/><circle cx="77.5" cy="51.5" r="1.4" fill="#fff"/>',
+miss:'<circle cx="44" cy="55" r="5.5" fill="#4a1d34"/><circle cx="76" cy="55" r="5.5" fill="#4a1d34"/><circle cx="46" cy="53" r="2" fill="#fff"/><circle cx="78" cy="53" r="2" fill="#fff"/>'}[st];
+const mouth={happy:'<path d="M47 65Q60 82 73 65Z" fill="#7a2a4a"/><path d="M53 72Q60 77 67 72" stroke="#ff8fa8" stroke-width="3" fill="none" stroke-linecap="round"/>',
+sleep:'<path d="M54 68Q60 72 66 68" stroke="#4a1d34" stroke-width="3" fill="none" stroke-linecap="round"/>',
+part:'<path d="M50 66Q60 76 70 66" stroke="#4a1d34" stroke-width="3.5" fill="none" stroke-linecap="round"/>',
+miss:'<path d="M52 72Q60 66 68 72" stroke="#4a1d34" stroke-width="3.5" fill="none" stroke-linecap="round"/>'}[st];
+const extra=st==='sleep'?'<text class="hz" x="94" y="22" font-size="16" font-weight="800" fill="#8b7cf0">z</text><text class="hz" x="104" y="8" font-size="12" font-weight="800" fill="#8b7cf0" style="animation-delay:.8s">z</text>':
+st==='happy'?`<g fill="#f5c75b"><path class="hs" d="M104 26l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z"/><path class="hs" style="animation-delay:.6s" d="M12 40l2 4.5 4.5 2-4.5 2-2 4.5-2-4.5-4.5-2 4.5-2z"/>${both?'<path class="hs" style="animation-delay:1.1s" d="M100 80l2 4.5 4.5 2-4.5 2-2 4.5-2-4.5-4.5-2 4.5-2z"/>':''}</g>`:'';
+const svg=`<svg viewBox="-12 -24 144 148" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${both&&st==='happy'?'#ffd36e':c1}"/><stop offset="1" stop-color="${both&&st==='happy'?'#f0a23a':c2}"/></linearGradient></defs>
+<g class="hb-${heartTap?'tap':st==='part'?'idle':st}"><ellipse cx="44" cy="110" rx="9" ry="5" fill="${c2}"/><ellipse cx="76" cy="110" rx="9" ry="5" fill="${c2}"/><ellipse cx="9" cy="64" rx="6" ry="9" fill="${c2}" transform="rotate(20 9 64)"/><ellipse cx="111" cy="64" rx="6" ry="9" fill="${c2}" transform="rotate(-20 111 64)"/>
+<path d="M60 106C20 80 8 58 8 40C8 22 22 12 36 12C46 12 55 18 60 26C65 18 74 12 84 12C98 12 112 22 112 40C112 58 100 80 60 106Z" fill="url(#hg)" opacity="${st==='sleep'?.88:1}"/><ellipse cx="32" cy="30" rx="9" ry="6" fill="#fff" opacity=".4" transform="rotate(-30 32 30)"/>
+<circle cx="33" cy="66" r="7" fill="#ff7a9a" opacity=".35"/><circle cx="87" cy="66" r="7" fill="#ff7a9a" opacity=".35"/>${eyes}${mouth}${HACC[m]}</g>${extra}</svg>`;
+const h=`<div class="mascot"><button class="mc-heart" data-heart="1" aria-label="Сердечко">${svg}</button><div class="mc-bubble"><small>Сердечко</small>${pick(msg)}</div></div>`;heartTap=false;return h}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
@@ -541,7 +596,7 @@ const addForm=`<div class="add"><input id="cn" placeholder="Название" ma
 document.getElementById('app').innerHTML=`
 ${tabs()}
 <div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
-<div class="hero">${twin}${who_}<div class="both">Заполнено дней: ${cnt} из ${nd}. Вместе <em>${both}</em> дн. со 100%${isFull?'. Все цели месяца выполнены ✓':''}</div>${loveBtn()}</div>
+${heartHtml()}<div class="hero">${twin}${who_}<div class="both">Заполнено дней: ${cnt} из ${nd}. Вместе <em>${both}</em> дн. со 100%${isFull?'. Все цели месяца выполнены ✓':''}</div>${loveBtn()}</div>
 <div class="card"><div class="cal">${cal}</div></div>
 <div class="card"><div class="dayhead"><div><h2>${sd[2]} ${MG[sd[1]-1]}</h2><small>${WD[dt.getDay()]}, ${vals[40]?(vals[40]==='sick'?'болею, день не считается':'выходной, день не считается'):'прогресс дня '+Math.round((dp||0)*100)+'%'+(dp===1?' ✓':'')}</small></div><div class="ringbox" style="width:52px;height:52px">${ring(dp||0,52,7,dp===1?'#f1b93a':acc)}</div></div>${restBar()}<div class="${vals[40]?'dim':''}">${rows}</div></div>
 <div class="card"><span class="lbl" style="display:block;margin-bottom:14px">Выполнение за месяц</span><div class="stats">${stats}</div></div>
@@ -555,6 +610,7 @@ else if(b.dataset.c){const v=document.getElementById('code').value.trim();if(v){
 else if(b.dataset.x){try{localStorage.removeItem('habits-code')}catch(e){}CODE='';remote=false;render()}
 else if(b.dataset.w){who=b.dataset.w;S=P[who];showGoals=false;const l=document.getElementById('love');if(l)l.remove();save();render();pullLove()}
 else if(b.dataset.love){sendLove(b)}
+else if(b.dataset.heart){heartN++;heartTap=true;render()}
 else if(b.dataset.mc){showCard()}
 else if(b.dataset.sky){showCard(skyCard)}
 else if(b.dataset.wrap){openWrap(b.dataset.wrap)}
