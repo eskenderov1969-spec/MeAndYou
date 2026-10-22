@@ -98,6 +98,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .del{background:var(--cell);color:var(--mute);height:38px;margin-top:8px;width:100%;font-size:13px}
 .stk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .sb{background:var(--cell);border-radius:20px;padding:14px 6px;text-align:center}
+.sb i{display:block;font-style:normal;font-size:12px;font-weight:800;margin-bottom:4px}
 .sb b{font:600 26px var(--fd);display:block}
 .sb span{font-size:12px;color:var(--mute);font-weight:600;display:block;margin-top:2px}
 .wsm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
@@ -131,7 +132,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .lovebtn{margin-top:8px;height:44px;padding:0 22px;border-radius:99px;background:color-mix(in srgb,#ea5a90 14%,var(--card));color:#d94a80;font-weight:700;font-size:14px;box-shadow:var(--shadow);transition:transform .15s}
 .lovebtn:active{transform:scale(.95)}
 .lovebtn.sent{background:#ea5a90;color:#fff}
-.mcbtn{align-self:center;height:46px;padding:0 24px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-weight:700;font-size:14px}
+.mcbtn{align-self:stretch;height:46px;padding:0 24px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-weight:700;font-size:14px}
 #love{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:440px;z-index:60;display:flex;align-items:center;gap:14px;padding:14px 18px;border:0;border-radius:24px;text-align:left;color:#fff;background:linear-gradient(135deg,#ea5a90,#f48fb4);box-shadow:0 14px 36px rgba(234,90,144,.4);animation:drop .5s cubic-bezier(.3,1.4,.5,1)}
 #love .hh{font-size:30px;animation:beat 1.2s ease-in-out infinite}
 #love b{display:block;font:600 16px var(--fd)}
@@ -224,9 +225,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .frc span{font-size:12px;font-weight:700}
 .frc strong{font:600 22px var(--fd)}
 .frc small{font-size:11px;color:var(--mute);font-weight:600}
-.fr.tg{background:linear-gradient(135deg,#ffe9b0,#ffd9e6);color:#3a2a4a}
-.fr.tg .frc div{background:rgba(255,255,255,.6)}
-.fr.tg .frc small,.fr.tg .frc span{color:#6b5a78}
+.fr.frt{background:linear-gradient(135deg,#ffe9b0,#ffd9e6);color:#3a2a4a}
+.fr.frt .frc div{background:rgba(255,255,255,.6)}
+.fr.frt .frc small,.fr.frt .frc span{color:#6b5a78}
 .add select{grid-column:1/-1;height:42px;border-radius:14px;border:0;background:var(--cell);color:var(--text);padding:0 12px;font:600 14px "Manrope",sans-serif}
 .mc-heart{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 .hb-spin{transform-box:fill-box;transform-origin:center;animation:hspin 1.2s ease-in-out}
@@ -347,8 +348,8 @@ const rate=ix.map(i=>{const n=wk.filter(k=>(D.days[k]||[])[i]!=null);return{i,n:
 return{avg:have.reduce((a,b)=>a+b,0)/have.length,best:['пн','вт','ср','чт','пт','сб','вс'][bi],full:ps.filter(x=>x===1).length,weak:rate[0]&&rate[0].r<1?info(D,rate[0].i).n:null,ty:wk.filter(k=>(D.days[k]||[])[4]===1).length}}
 function bars(D,i,nd){const h=info(D,i),mx=h.g*1.6;let sv='',sum=0,c=0;
 for(let d=1;d<=nd;d++){const v=(D.days[key(vy,vm,d)]||[])[i];if(v==null)continue;sum+=v;c++;const ht=Math.max(3,Math.min(1,v/mx)*50);sv+=`<rect x="${(d-1)*10+1}" y="${54-ht}" width="8" height="${ht}" rx="3" fill="var(--c${cc(i)})" opacity="${v>=h.g?1:.45}"/>`}
-const gy=54-Math.min(1,h.g/mx)*50,a=c?sum/c:0;
-return `<div class="ch"><div class="chh"><b>${h.n}</b><small>${c?'среднее '+(h.u==='шагов'?big(Math.round(a)):num(Math.round(a*10)/10))+' '+h.u:'нет данных'}</small></div><svg viewBox="0 0 ${nd*10} 56" preserveAspectRatio="none"><line x1="0" x2="${nd*10}" y1="${gy}" y2="${gy}" stroke="var(--mute)" stroke-dasharray="3 4" opacity=".6"/>${sv}</svg></div>`}
+const gy=54-Math.min(1,h.g/mx)*50,a=c?sum/c:0,pl=(n,x,y,z)=>{n=Math.abs(n)%100;const k=n%10;return n>10&&n<20?z:k===1?x:k>1&&k<5?y:z};
+return `<div class="ch"><div class="chh"><b>${h.n}</b><small>${c?'среднее '+(h.u==='шагов'?big(Math.round(a)):num(Math.round(a*10)/10))+' '+(h.u==='урок'?pl(Math.round(a),'урок','урока','уроков'):h.u):'нет данных'}</small></div><svg viewBox="0 0 ${nd*10} 56" preserveAspectRatio="none"><line x1="0" x2="${nd*10}" y1="${gy}" y2="${gy}" stroke="var(--mute)" stroke-dasharray="3 4" opacity=".6"/>${sv}</svg></div>`}
 function renderStats(){
 const acc=PEOPLE.find(p=>p.id===who).acc,D=S,nd=new Date(vy,vm+1,0).getDate();
 const rst=(D,k)=>(D.days[k]||[])[40],tg2=k=>{const st=PEOPLE.map(p=>rst(P[p.id],k)?null:pctOf(P[p.id],k)===1).filter(x=>x!==null);return st.length?st.every(Boolean):null},tog=streaks(tg2);
@@ -363,10 +364,10 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
 <div class="who">${PEOPLE.map(p=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc};--pd:${p.deep}"><b>${p.n}</b></button>`).join('')}</div>
 <button class="mcbtn" data-mc="1">Карточка месяца</button>
-<div class="card"><span class="lbl">Серии подряд со 100%</span><div class="stk">${stk.map(x=>`<div class="sb"><b>${x.cur}</b><span>дн. подряд</span><span>рекорд ${x.best}</span></div>`).join('')}</div><div class="note" style="margin:10px 0 0">${stk.map(x=>x.n).join(' · ')}</div></div>
+<div class="card"><span class="lbl">Серии подряд со 100%</span><div class="stk">${stk.map(x=>`<div class="sb"><i>${x.n}</i><b>${x.cur}</b><span>дн. подряд</span><span>рекорд ${x.best}</span></div>`).join('')}</div></div>
 <div class="card"><span class="lbl">Итоги недели ${f(wk[0])} – ${f(wk[6])}</span><div class="wsm">${wcards}</div><div class="wkn"><button data-wk="-7" aria-label="Прошлая неделя">‹</button><small style="color:var(--mute);font-weight:600">неделя выбранного дня</small><button data-wk="7" aria-label="Следующая неделя">›</button></div></div>
 <div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).filter(i=>i!==30).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Тёмный столбик: цель выполнена.</div></div>
-<div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}${secChips(D)}</div>${secNote(D)}</div>
+<div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}</div>${secBlock(D)}${secNote(D)}</div>
 <div class="sync">${syncMsg}</div>`}
 const buzz=()=>{try{navigator.vibrate&&navigator.vibrate([50,40,90])}catch(e){}};
 const loveBtn=()=>{const o=PEOPLE.find(p=>p.id!==who);return `<button class="lovebtn" data-love="1">❤ Отправить сердечко ${o.dat}</button>`};
@@ -528,15 +529,17 @@ const SEC=[
 ['wknd','🌗','Идеальные выходные',D=>weeksOf(D).some(w=>pctOf(D,w[5])===1&&pctOf(D,w[6])===1)],
 ['nogap','🧩','Месяц без пропусков',D=>{const ms={};Object.keys(D.days).forEach(k=>{ms[k.slice(0,7)]=1});return Object.keys(ms).some(m=>{const[y,mo]=m.split('-').map(Number);if(y===now.getFullYear()&&mo===now.getMonth()+1)return false;const nd=new Date(y,mo,0).getDate();for(let d=1;d<=nd;d++){const k=key(y,mo-1,d);if(pctOf(D,k)==null&&!rs(D,k))return false}return true})}],
 ['tog10','🤝','Десять дней вместе',()=>Object.keys(P.emir.days).filter(k=>PEOPLE.every(p=>pctOf(P[p.id],k)===1)).length>=10],
-['egg','🥚','Нашла секрет сердечка',()=>{try{return !!localStorage.getItem('egg-'+who)}catch(e){return false}}]];
+['egg','🥚',()=>who==='emir'?'Нашёл секрет сердечка':'Нашла секрет сердечка',()=>{try{return !!localStorage.getItem('egg-'+who)}catch(e){return false}}]];
 const secOpen=D=>SEC.filter(x=>x[3](D));
-const secChips=D=>secOpen(D).map(x=>`<span class="sec">${x[1]} ${x[2]}</span>`).join('');
+const nm=x=>typeof x[2]==='function'?x[2]():x[2];
+const secChips=D=>secOpen(D).map(x=>`<span class="sec">${x[1]} ${nm(x)}</span>`).join('');
+const secBlock=D=>{const c=secChips(D);return c?`<span class="lbl" style="display:block;margin-top:16px">Секретные</span><div class="ach">${c}</div>`:''};
 const secNote=D=>{const n=SEC.length-secOpen(D).length;return n?`<div class="note" style="margin:10px 0 0">Секретных достижений ещё не открыто: ${n}</div>`:''};
 function toast(h){let e=document.getElementById('secret');if(!e){e=document.createElement('button');e.id='secret';document.body.appendChild(e);e.onclick=()=>e.remove()}e.innerHTML=h;clearTimeout(e._t);e._t=setTimeout(()=>e.remove(),6000)}
 function checkSecrets(silent){if(!CODE)return;const ids=secOpen(S).map(x=>x[0]);let old=null;try{old=JSON.parse(localStorage.getItem('sec-'+who))}catch(e){}
 try{localStorage.setItem('sec-'+who,JSON.stringify(ids))}catch(e){}
 if(silent||old===null)return;const nw=ids.filter(i=>!old.includes(i));
-if(nw.length){const x=SEC.find(y=>y[0]===nw[0]);toast(`<b>Секретное достижение!</b><span>${x[1]} ${x[2]}</span>`);buzz()}}
+if(nw.length){const x=SEC.find(y=>y[0]===nw[0]);toast(`<b>Секретное достижение!</b><span>${x[1]} ${nm(x)}</span>`);buzz()}}
 const HCOL=[['#ff9fb5','#f0587d'],['#ff8fab','#e63e6d'],['#ffa6c9','#ec6aa5'],['#ffa3b8','#f0627f'],['#ff9ec4','#e8589a'],['#ff9aa8','#f0506b'],['#ff9bb0','#e94a69'],['#ffa8b9','#e8607a'],['#ff9fb2','#d9566f'],['#ff9db0','#e8506a'],['#f79ac0','#c9457f'],['#ff8f9f','#d63a55']];
 const HACC=['<path d="M34 24Q60-10 86 24Z" fill="#6fb3ff"/><rect x="32" y="22" width="56" height="8" rx="4" fill="#fff"/><circle cx="60" cy="-4" r="6" fill="#fff"/>',
 '<path d="M30 80Q60 96 90 80L88 90Q60 106 32 90Z" fill="#ff6b81"/><rect x="76" y="88" width="11" height="20" rx="4" fill="#ff6b81"/>',
@@ -620,7 +623,7 @@ ${row('🌟','Лучшая неделя',r=>r.week&&[Math.round(r.week.v*100)+'%
 ${row('📅','Лучший месяц',r=>r.month&&[Math.round(r.month.v*100)+'%',MN[+r.month.k.slice(5,7)-1]+' '+r.month.k.slice(0,4)])}
 ${row('⌨️','Занятий печатью за неделю',r=>r.ty&&[r.ty.v+'',fd(r.ty.k)])}
 ${row('💯','Всего дней со 100%',r=>[r.full+' дн.','за всё время'])}
-<div class="card fr tg"><b>🤝 Наши общие рекорды</b><div class="frc"><div><span>Серия вместе</span><strong>${tb?tb.v+' дн.':'—'}</strong><small>${tb?'до '+fd(tb.k):'пока нет'}</small></div><div><span>Дней со 100% вместе</span><strong>${both}</strong><small>за всё время</small></div><div><span>Лучший месяц вместе</span><strong>${bmx?bmx[1]+' дн.':'—'}</strong><small>${bmx?MN[+bmx[0].slice(5)-1]+' '+bmx[0].slice(0,4):'пока нет'}</small></div><div><span>Прошли вместе</span><strong>${r1(km)} км</strong><small>по шагам</small></div></div></div>
+<div class="card fr frt"><b>🤝 Наши общие рекорды</b><div class="frc"><div><span>Серия вместе</span><strong>${tb?tb.v+' дн.':'—'}</strong><small>${tb?'до '+fd(tb.k):'пока нет'}</small></div><div><span>Дней со 100% вместе</span><strong>${both}</strong><small>за всё время</small></div><div><span>Лучший месяц вместе</span><strong>${bmx?bmx[1]+' дн.':'—'}</strong><small>${bmx?MN[+bmx[0].slice(5)-1]+' '+bmx[0].slice(0,4):'пока нет'}</small></div><div><span>Прошли вместе</span><strong>${r1(km)} км</strong><small>по шагам</small></div></div></div>
 <div class="sync">${syncMsg}</div>`}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
@@ -628,7 +631,7 @@ const DW=['вс','пн','вт','ср','чт','пт','сб'];
 const cell=(p,k)=>{const D=P[p.id],v=D.days[k],pc=pctOf(D,k);
 if(v&&v[40])return `<button class="hc" data-hw="${p.id}" data-hk="${k}"><i>${v[40]==='sick'?'🤒 болею':'🌴 выходной'}</i></button>`;
 if(pc==null)return `<button class="hc" data-hw="${p.id}" data-hk="${k}"><i>нет данных</i></button>`;
-return `<button class="hc ${pc===1?'full':''}" data-hw="${p.id}" data-hk="${k}"><b>${Math.round(pc*100)}%${pc===1?' ✓':''}</b><span>${v.slice(0,4).map((x,i)=>x==null?'<u>–</u>':`<u class="${x>=D.goals[i]?'ok':''}">${short(i,x)}</u>`).join('')}${v[4]===1?'<u class="ok">⌨</u>':''}${v[30]===1?'<u class="ok">✎</u>':''}</span></button>`};
+return `<button class="hc ${pc===1?'full':''}" data-hw="${p.id}" data-hk="${k}"><b>${Math.round(pc*100)}%${pc===1?' ✓':''}</b><span>${v.slice(0,4).map((x,i)=>x==null?'<u>–</u>':`<u class="${x>=D.goals[i]?'ok':''}">${short(i,x)}</u>`).join('')}${v[4]===1?'<u class="ok">⌨</u>':''}${v[30]===1?'<u class="ok">📝</u>':''}</span></button>`};
 let rows='';for(let d=last;d>=1;d--){const k=key(vy,vm,d);
 rows+=`<div class="hr"><div class="hdt"><b>${d}</b><small>${DW[new Date(vy,vm,d).getDay()]}</small></div>${PEOPLE.map(p=>cell(p,k)).join('')}</div>`}
 const sum=PEOPLE.map(p=>{const m=monthOf(P[p.id]);return `<div class="mini"><div class="ringbox" style="width:64px;height:64px">${ring(m.mp,64,8,p.acc)}<b>${Math.round(m.mp*100)}%</b></div><span>${p.n}: ${m.full} дн. со 100%</span></div>`}).join('');
