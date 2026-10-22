@@ -54,7 +54,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .d.full::before{background:var(--gold)}
 .d.full span{color:var(--goldtxt);font-weight:700}
 .d.sel{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--acc)}
-.d.today span{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:2px}
+.d.now span{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:2px}
 .dayhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .dayhead h2{margin:0;font:600 20px var(--fd);letter-spacing:-.01em}
 .dayhead small{color:var(--mute);display:block;margin-top:4px;font-size:13px;font-weight:600}
@@ -708,7 +708,7 @@ return arc(cx,85,64,15,mo[ix].mp,col,sel?1:.55)+`<text x="${cx}" y="94" text-anc
 const who_=`<div class="who">${PEOPLE.map((p,ix)=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc};--pd:${p.deep}"><b>${p.n}</b><small>${mo[ix].full} дн. со 100%</small></button>`).join('')}</div>`;
 let cal=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="dow">${x}</div>`).join('')+'<div class="d e"></div>'.repeat(off);
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(S,k);
-cal+=`<button class="d ${p===1?'full':''} ${(S.days[k]||[])[40]?'rest':''} ${(S.days[k]||[])[4]===1?'ty':''} ${k===sel?'sel':''} ${k===todayK()?'today':''}" style="--p:${Math.round((p||0)*100)}%" data-k="${k}"><span>${d}</span>${(S.days[k]||[])[40]?`<i class="ri">${S.days[k][40]==='sick'?'🤒':'🌴'}</i>`:''}</button>`}
+cal+=`<button class="d ${p===1?'full':''} ${(S.days[k]||[])[40]?'rest':''} ${(S.days[k]||[])[4]===1?'ty':''} ${k===sel?'sel':''} ${k===todayK()?'now':''}" style="--p:${Math.round((p||0)*100)}%" data-k="${k}"><span>${d}</span>${(S.days[k]||[])[40]?`<i class="ri">${S.days[k][40]==='sick'?'🤒':'🌴'}</i>`:''}</button>`}
 const sd=sel.split('-').map(Number),dt=new Date(sd[0],sd[1]-1,sd[2]),vals=S.days[sel]||[],dp=pctOf(S,sel);
 const rows=idxsOf(S).filter(i=>i!==30).map(i=>{const h=info(S,i),v=vals[i],g=h.g,p=v==null?0:Math.min(v/g,1),ok=v!=null&&v>=g;
 return `<div class="h" style="--hc:var(--c${cc(i)})"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24">${ICONS[i]||ICONS[4]}</svg></span><div class="ht"><b>${h.n}</b><small>цель ${gfmt(i)} ${h.u}</small></div><span class="ok">${ok?'✓':''}</span></div>
