@@ -165,6 +165,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .wrbtn:active{transform:scale(.98)}
 .wrbtn b{font:600 19px var(--fd)}
 .wrbtn span{font-size:13px;font-weight:600;opacity:.85}
+.wrbtn.alt2{background:linear-gradient(135deg,#d98a2b,#c0407a)}
 .wrbtn.alt{background:linear-gradient(135deg,#1f6f8b,#4b3fa8)}
 #wrap{position:fixed;inset:0;z-index:65;color:#fff;display:flex;flex-direction:column;transition:background .4s;user-select:none;-webkit-user-select:none}
 .wr-bars{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:14px;right:14px;display:flex;gap:4px;z-index:5}
@@ -363,7 +364,7 @@ if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){const was=pctOf(S,k);checkRecord(k,i,v);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){popDay=true;setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render();popDay=false;checkSecrets()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
-const tabs=()=>`<div class="trow"><div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['fame','Рекорды'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div><button class="gear ${view==='set'?'on':''}" data-v="set" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div>`;
+const tabs=()=>`<div class="trow"><div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v||(v==='hist'&&view==='fame')?'on':''}">${t}</button>`).join('')}</div><button class="gear ${view==='set'?'on':''}" data-v="set" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div>`;
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
 function arc(cx,cy,r,sw,p,col,op){const c=2*Math.PI*r;return `<g opacity="${op}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${cx} ${cy})"/>`:''}</g>`}
 function burst(){if(!UI.conf||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -658,7 +659,7 @@ const all=[...new Set(PEOPLE.flatMap(p=>Object.keys(P[p.id].days)))].sort();let 
 if(all.length){const a=all[0].split('-').map(Number),z=all[all.length-1];for(let d=new Date(a[0],a[1]-1,a[2]);;d.setDate(d.getDate()+1)){const k=key(d.getFullYear(),d.getMonth(),d.getDate());if(k>z)break;const v=tgf(k);if(v===null)continue;if(v){tr++;if(!tb||tr>tb.v)tb={v:tr,k};if(PEOPLE.every(p=>pctOf(P[p.id],k)===1)){both++;bm[k.slice(0,7)]=(bm[k.slice(0,7)]||0)+1}}else tr=0}}
 const bmx=Object.entries(bm).sort((a,b)=>b[1]-a[1])[0],km=PEOPLE.reduce((a,p)=>a+Object.values(P[p.id].days).reduce((s,v)=>s+(v[2]||0),0),0)*.00075;
 document.getElementById('app').innerHTML=`${tabs()}
-<div class="top"><h1 style="margin:0 auto">Зал славы</h1></div>
+<div class="top"><button class="nav" data-v="hist" aria-label="Назад в историю">‹</button><h1>Зал славы</h1><span style="width:40px"></span></div>
 <div class="note" style="margin:0">Что у нас получалось. Без соревнования: просто рекорды друг друга рядом.</div>
 ${row('👟','Больше всего шагов за день',r=>r.steps&&[big(r.steps.v),fd(r.steps.k),r.steps.k])}
 ${row('🎓','Больше всего уроков за день',r=>r.eng&&[r1(r.eng.v),fd(r.eng.k),r.eng.k])}
@@ -724,6 +725,7 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><button class="nav" data-m="-1">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1">›</button></div>
 <button class="wrbtn" data-wrap="year"><b>Итоги ${vy} года</b><span>Самый сильный месяц, лучшая привычка, уроки, километры и серия</span></button>
 <button class="wrbtn alt" data-wrap="month"><b>Итоги: ${MN[vm].toLowerCase()} ${vy}</b><span>То же за выбранный месяц. Листай месяцы стрелками выше</span></button>
+<button class="wrbtn alt2" data-v="fame"><b>Зал славы</b><span>Личные рекорды Эмира и Саиды рядом и общие рекорды</span></button>
 <div class="card"><span class="lbl" style="display:block;margin-bottom:12px">Итоги месяца</span><div class="duo">${sum}</div></div>
 <div><div class="hr"><div></div>${PEOPLE.map(p=>`<div class="hn"><span class="dot" style="background:${p.acc}"></span>${p.n}</div>`).join('')}</div>
 <div class="note">Порядок: английский, чтение, шаги, сон. Зелёным выделена выполненная цель. Нажми на день, чтобы открыть его в планере.</div>
