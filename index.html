@@ -273,6 +273,19 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .lovebtn,.mcbtn{height:46px}
 .wrap>.note{margin:0!important;padding:0 10px}
 @media(prefers-reduced-motion:reduce){#app.enter>*,#app.enter circle[stroke-dasharray],.ringbox.pop{animation:none}}
+.noanim *,.noanim *::before,.noanim *::after{animation:none!important;transition:none!important}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;padding:14px 0;background:none;text-align:left;border-bottom:1px solid color-mix(in srgb,var(--text) 8%,transparent)}
+.sw:last-child{border-bottom:0}
+.sw b{display:block;font-size:15px}
+.sw small{display:block;margin-top:3px;color:var(--mute);font-weight:600;font-size:12px;line-height:1.35}
+.sw i{flex:none;width:46px;height:28px;border-radius:99px;background:var(--track);position:relative;transition:background .2s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .2s}
+.sw.on i{background:var(--acc)}
+.sw.on i::after{transform:translateX(18px)}
+.trow{display:flex;gap:8px;align-items:center}
+.trow .seg{flex:1;min-width:0}
+.gear{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--text) 7%,transparent);color:var(--mute)}
+.gear.on{background:var(--card);color:var(--text);box-shadow:0 2px 10px rgba(60,50,130,.12)}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -297,11 +310,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 </head>
 <body>
 <div id="splash" aria-hidden="true"><svg viewBox="0 0 160 120"><circle class="tr" cx="62" cy="62" r="40"/><circle class="pg" cx="62" cy="62" r="40" stroke="#7fa6f5" style="--to:55.3" transform="rotate(-90 62 62)"/><circle class="tr" cx="98" cy="62" r="40"/><circle class="pg" cx="98" cy="62" r="40" stroke="#f48fb4" style="--to:15.1;animation-delay:.25s" transform="rotate(-90 98 62)"/><circle class="dot" cx="80" cy="10" r="6"/></svg><h2>Планер</h2><div class="ld"><i></i></div></div>
-<script>try{if(sessionStorage.getItem('sp')){document.getElementById('splash').remove()}else{sessionStorage.setItem('sp','1')}}catch(e){}</script>
+<script>try{var c=JSON.parse(localStorage.getItem('cfg')||'{}');if(c.splash===0||sessionStorage.getItem('sp')){document.getElementById('splash').remove()}else{sessionStorage.setItem('sp','1')}}catch(e){}</script>
 <div class="wrap" id="app"></div>
 <script>
 const H=[{n:'Английский в Duolingo',u:'урок',g:1,s:1},{n:'Чтение книги',u:'ч',g:1,s:.5},{n:'Ходьба',u:'шагов',g:8000,s:1000},{n:'Сон (минимум)',u:'ч',g:7,s:.5}];
-const PEOPLE=[{id:'emir',n:'Эмир',dat:'Эмиру',acc:'#8fb4ec',deep:'#4a82f0'},{id:'saida',n:'Саида',dat:'Саиде',acc:'#f0a9c6',deep:'#ea5a90'}];
+const PEOPLE=[{id:'emir',n:'Эмир',dat:'Эмиру',gen:'Эмира',acc:'#8fb4ec',deep:'#4a82f0'},{id:'saida',n:'Саида',dat:'Саиде',gen:'Саиды',acc:'#f0a9c6',deep:'#ea5a90'}];
 const MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const MG=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
 const WD=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
@@ -350,10 +363,10 @@ if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){const was=pctOf(S,k);checkRecord(k,i,v);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){popDay=true;setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render();popDay=false;checkSecrets()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
-const tabs=()=>`<div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['fame','Рекорды'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div>`;
+const tabs=()=>`<div class="trow"><div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['fame','Рекорды'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v?'on':''}">${t}</button>`).join('')}</div><button class="gear ${view==='set'?'on':''}" data-v="set" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div>`;
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
 function arc(cx,cy,r,sw,p,col,op){const c=2*Math.PI*r;return `<g opacity="${op}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${cx} ${cy})"/>`:''}</g>`}
-function burst(){if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+function burst(){if(!UI.conf||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
 const cols=['#7c9cf5','#f08fb0','#f1b93a','#4fc8b0','#b58cf0'];
 for(let i=0;i<26;i++){const e=document.createElement('div');e.className='cf';const a=Math.random()*Math.PI*2,d=70+Math.random()*130;
 e.style.cssText=`background:${cols[i%5]};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d+60}px;--r:${Math.random()*540-270}deg`;document.body.appendChild(e);setTimeout(()=>e.remove(),1200)}}
@@ -402,7 +415,7 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).filter(i=>i!==30).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Тёмный столбик: цель выполнена.</div></div>
 <div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}</div>${secBlock(D)}${secNote(D)}</div>
 <div class="sync">${syncMsg}</div>`}
-const buzz=()=>{try{navigator.vibrate&&navigator.vibrate([50,40,90])}catch(e){}};
+const buzz=()=>{if(!UI.vib)return;try{navigator.vibrate&&navigator.vibrate([50,40,90])}catch(e){}};
 const loveBtn=()=>{const o=PEOPLE.find(p=>p.id!==who);return `<button class="lovebtn" data-love="1">❤ Отправить сердечко ${o.dat}</button>`};
 async function sendLove(btn){const me=PEOPLE.find(p=>p.id===who);
 if(!remote){btn.textContent='Нужна связь с базой';return}
@@ -458,7 +471,6 @@ const u=.09+.82*(d-1)/(nd-1)+(r()-.5)*.03,v=Math.min(.84,Math.max(.16,.5+Math.si
 days.push({d,u,v,t,rest:st.includes('rest')})}
 const rb=rnd(seed+7),bg=Array.from({length:70},()=>({u:rb(),v:rb(),s:.5+rb()*1.3,w:rb()*4}));
 return{nd,days,bg,cnt}}
-const conName=()=>`Созвездие ${MG[vm]}`;
 function renderSky(){const D=skyData(),W=360,H=470,px=o=>(o.u*W).toFixed(1),py=o=>(70+o.v*(H-140)).toFixed(1);
 const gold=D.days.filter(o=>o.t==='gold');
 const defs=Object.entries(SC).map(([n,c])=>`<radialGradient id="g${n}"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`).join('');
@@ -469,10 +481,10 @@ const R=o.t==='gold'?11:8;return `<g class="${o.d%2?'tw1':'tw2'}" style="animati
 const sub=D.cnt.gold?conName():'Небо месяца';
 document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
-<div class="sky"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Небо месяца"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d2866"/><stop offset="1" stop-color="#0f0c2e"/></linearGradient>${defs}</defs><rect width="${W}" height="${H}" fill="url(#sg)"/>${bgs}${lines}${stars}
+<div class="sky"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Небо месяца"><defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d2866"/><stop offset="1" stop-color="#0f0c2e"/></linearGradient>${defs}</defs><rect width="${W}" height="${H}" fill="url(#sg)"/>${bgs}${lines}${stars}${D.days.map(o=>`<circle cx="${px(o)}" cy="${py(o)}" r="13" fill="transparent" data-star="${key(vy,vm,o.d)}"/>`).join('')}
 <text x="${W/2}" y="40" text-anchor="middle" font-family="Unbounded,Manrope,sans-serif" font-size="19" font-weight="600" fill="#fff">${MN[vm]} ${vy}</text><text x="${W/2}" y="60" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" opacity=".55">${sub}</text></svg></div>
 <div class="skyl"><span><i style="background:${SC.blue}"></i>${PEOPLE[0].n} ${D.cnt.blue}</span><span><i style="background:${SC.pink}"></i>${PEOPLE[1].n} ${D.cnt.pink}</span><span><i style="background:${SC.gold}"></i>Вместе ${D.cnt.gold}</span></div>
-<div class="note" style="margin:0">${D.cnt.gold?'Золотые звёзды соединены линиями: это ваше созвездие месяца.':'Закройте день на 100% вдвоём, и появится золотая звезда. Золотые звёзды соединяются в созвездие.'}</div>
+<div class="note" style="margin:0">${D.cnt.gold?'Золотые звёзды соединены линиями: это ваше созвездие месяца.':'Закройте день на 100% вдвоём, и появится золотая звезда. Золотые звёзды соединяются в созвездие.'}<br>Нажми на звезду, чтобы увидеть тот день.</div>
 <button class="mcbtn" data-sky="1">Сохранить картинкой</button>
 <div class="sync">${syncMsg}</div>`}
 async function skyCard(){try{await document.fonts.load('600 60px Unbounded');await document.fonts.load('700 30px Manrope')}catch(e){}
@@ -529,7 +541,7 @@ function closeWrap(){const e=document.getElementById('wrap');if(e)e.remove();doc
 function drawWrap(){let e=document.getElementById('wrap');if(!e){e=document.createElement('div');e.id='wrap';document.body.appendChild(e)}
 const w=WR,s=w.sl[w.i];e.style.background=s.c;
 e.innerHTML=`<div class="wr-bars">${w.sl.map((_,j)=>`<i class="${j<=w.i?'a':''}"></i>`).join('')}</div><button class="wr-x" data-wx="1" aria-label="Закрыть">×</button><div class="wr-s">${s.h}</div><button class="wr-prev" data-wp="1" aria-label="Назад"></button><button class="wr-next" data-wn="1" aria-label="Дальше"></button>`;
-const rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rm=!UI.anim||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 e.querySelectorAll('[data-c]').forEach(b=>{const to=+b.dataset.c,d=+b.dataset.d,fm=v=>v.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});if(rm){b.textContent=fm(to);return}
 const t0=performance.now(),st=x=>{const q=Math.min(1,(x-t0)/1000);b.textContent=fm(to*(1-Math.pow(1-q,3)));if(q<1)requestAnimationFrame(st)};requestAnimationFrame(st)})}
 const wgo=d=>{if(!WR)return;const n=Math.max(0,Math.min(WR.sl.length-1,WR.i+d));if(n!==WR.i){WR.i=n;drawWrap()}};
@@ -625,7 +637,7 @@ if((m===12&&d===31)||(m===1&&d<=2))return{msg:m===12?'Завтра Новый г
 return null}
 function datesForm(){return `<div class="add" style="margin-top:24px"><span class="lbl" style="grid-column:1/-1">Особые даты: дни рождения и памятные дни</span><input id="dn" placeholder="Имя или название" maxlength="30"><input id="dd" type="date" style="grid-column:span 2"><select id="dt"><option value="bd">День рождения</option><option value="sp">Особый день</option></select><button class="addb" data-adddate="1">Добавить дату</button>${(S.dates||[]).map(x=>`<button class="del" data-deldate="${x.id}">${x.t==='bd'?'🎂':'💞'} ${esc(x.n)}, ${x.d}.${String(x.m).padStart(2,'0')} · Удалить</button>`).join('')}</div>`}
 let skyTaps=0,skyLast=0,hl=null;
-function rain(){const e=['❤','💗','💖','✨'];for(let i=0;i<28;i++){const d=document.createElement('div');d.className='rain';d.textContent=e[i%4];d.style.cssText=`left:${Math.random()*96}vw;animation-duration:${1.8+Math.random()*1.6}s;animation-delay:${Math.random()*.6}s;font-size:${16+Math.random()*16}px`;document.body.appendChild(d);setTimeout(()=>d.remove(),4400)}}
+function rain(){if(!UI.conf)return;const e=['❤','💗','💖','✨'];for(let i=0;i<28;i++){const d=document.createElement('div');d.className='rain';d.textContent=e[i%4];d.style.cssText=`left:${Math.random()*96}vw;animation-duration:${1.8+Math.random()*1.6}s;animation-delay:${Math.random()*.6}s;font-size:${16+Math.random()*16}px`;document.body.appendChild(d);setTimeout(()=>d.remove(),4400)}}
 function egg(kind){try{localStorage.setItem('egg-'+who,'1')}catch(e){}
 if(kind==='star'){const sk=document.querySelector('.sky');if(sk){const s=document.createElement('div');s.className='shoot';sk.appendChild(s);setTimeout(()=>s.remove(),1300)}toast('<b>Падающая звезда</b><span>Загадай желание ✨</span>');checkSecrets();return}
 if(kind==='rain'){heartFx='spin';heartMsg='Секрет найден! Я люблю вас обоих';rain();buzz()}else{heartFx='hug';heartMsg='Ой, как приятно! Обними меня ещё'}
@@ -672,7 +684,32 @@ const items=[...idxsOf(D).filter(i=>i!==30||tk>=PREP_FROM).map(i=>({i,n:['Анг
 const st=x=>{const val=v[x.i];if(x.i===4||x.i===30)return val===1?'done':'';if(val==null)return '';return val>=info(D,x.i).g?'done':val>0?'part':''};
 const rem=items.filter(x=>x.i!==4&&st(x)!=='done').length;
 return `<div class="card today"><div class="tdh"><div><b>Сегодня</b><small>${dt.getDate()} ${MG[dt.getMonth()]}${v[40]?', день отдыха':rem?`, осталось ${rem}`:', всё выполнено'}</small></div><div class="ringbox${popDay?' pop':''}" style="width:52px;height:52px">${ring(v[40]?0:(dp||0),52,7,dp===1?'#f1b93a':'var(--acc)')}<b>${v[40]?'—':Math.round((dp||0)*100)+'%'}</b></div></div>
-${heartHtml()}<div class="tc">${items.map(x=>`<button data-tc="${x.i===4?'ty':x.i}" style="--hc:var(--c${x.c})" aria-label="${x.n}"><span class="tci ${st(x)}"><svg viewBox="0 0 24 24">${x.ic}</svg></span>${x.n}</button>`).join('')}</div></div>`}
+${UI.heart?heartHtml():''}<div class="tc">${items.map(x=>`<button data-tc="${x.i===4?'ty':x.i}" style="--hc:var(--c${x.c})" aria-label="${x.n}"><span class="tci ${st(x)}"><svg viewBox="0 0 24 24">${x.ic}</svg></span>${x.n}</button>`).join('')}</div></div>`}
+const CON={w:['Зимней Сказки','Тёплого Чая','Снежного Покоя','Северного Сияния','Тихого Камина','Двух Сердец'],s:['Весеннего Ручья','Первых Цветов','Лёгкого Облака','Рассветного Луча','Тайного Сада','Светлой Мечты'],u:['Летнего Ветерка','Тёплого Вечера','Спокойного Моря','Яркого Дня','Дальней Дороги','Лёгких Шагов'],a:['Осенней Листвы','Янтарного Заката','Тёплой Осени','Ночного Костра','Тихого Дождя','Золотой Нити']};
+const conName=()=>{const pool=CON[vm===11||vm<2?'w':vm<5?'s':vm<8?'u':'a'],ix=(vm*2+vy%3)%pool.length;return 'Созвездие '+pool[ix]};
+function showDay(k){const a=k.split('-').map(Number),dt=new Date(a[0],a[1]-1,a[2]),f=PEOPLE.map(p=>pctOf(P[p.id],k)===1),sn=['Английский','Чтение','Шаги','Сон'];
+const st=f[0]&&f[1]?'Золотая звезда: день закрыт у обоих':f[0]?`Голубая звезда: день закрыт у ${PEOPLE[0].gen}`:f[1]?`Розовая звезда: день закрыт у ${PEOPLE[1].gen}`:'Звезда не зажглась. Так тоже бывает';
+const cols=PEOPLE.map(p=>{const D=P[p.id],v=D.days[k]||[],pc=pctOf(D,k);
+if(v[40])return `<div class="wp"><b>${p.n}</b><span>${v[40]==='sick'?'Болезнь':'Выходной'}</span><i>День не считается</i></div>`;
+const l=idxsOf(D).filter(i=>i!==30&&v[i]!=null).map(i=>{const h=info(D,i);return `${i<4?sn[i]:esc(h.n)}: ${i===2?big(v[i]):num(v[i])}${h.u==='ч'?' ч':''}`});
+if(v[30]===1)l.push('Подготовка ✓');if(v[4]===1)l.push('Печать ✓');
+if(!l.length)return `<div class="wp"><b>${p.n}</b><i>Нет записей</i></div>`;
+return `<div class="wp"><b>${p.n}</b><span>${pc==null?'—':Math.round(pc*100)+'%'}${pc===1?' ✓':''}</span>${l.map(x=>`<i>${x}</i>`).join('')}</div>`});
+const e=document.createElement('div');e.id='mcard';
+e.innerHTML=`<button class="mcbg" data-mx="1" aria-label="Закрыть"></button><div class="mcb"><div class="lbl" style="font:600 18px var(--fd);color:var(--text)">${a[2]} ${MG[a[1]-1]}, ${WD[dt.getDay()]}</div><div class="note" style="margin:6px 0 0;text-align:left">${st}</div><div class="wsm">${cols.join('')}</div><button class="cls" data-mx="1">Закрыть</button></div>`;
+document.body.appendChild(e)}
+let UI={vib:1,conf:1,splash:1,heart:1,anim:1};try{UI={...UI,...JSON.parse(localStorage.getItem('cfg')||'{}')}}catch(e){}
+const applyUI=()=>document.documentElement.classList.toggle('noanim',!UI.anim);
+const saveUI=()=>{try{localStorage.setItem('cfg',JSON.stringify(UI))}catch(e){}applyUI()};
+applyUI();
+function renderSettings(){const row=(k,t,d)=>`<button class="sw ${UI[k]?'on':''}" data-ui="${k}"><span><b>${t}</b><small>${d}</small></span><i></i></button>`,quiet=!UI.vib&&!UI.conf&&!UI.anim;
+document.getElementById('app').innerHTML=`${tabs()}
+<div class="top"><h1 style="margin:0 auto">Настройки</h1></div>
+<button class="mcbtn" data-quiet="1">${quiet?'Выключить тихий режим':'Тихий режим: без вибрации, конфетти и анимаций'}</button>
+<div class="card">${row('vib','Вибрация','Короткая вибрация при закрытом дне, рекорде и сообщениях (Android)')}${row('conf','Конфетти','Праздник на экране при закрытии дня и рекордах')}${row('anim','Анимации','Плавные переходы, кольца и движение сердечка')}${row('splash','Заставка при входе','Кольца и слово «Планер» при открытии')}${row('heart','Сердечко','Талисман в карточке «Сегодня»')}</div>
+<div class="card">${themeForm()}</div>
+<button class="link" data-x="1">Сменить код доступа</button>
+<div class="sync">Настройки хранятся на этом устройстве</div>`}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
@@ -699,6 +736,7 @@ if(view==='hist'){renderHist();return}
 if(view==='stats'){renderStats();return}
 if(view==='sky'){renderSky();return}
 if(view==='fame'){renderFame();return}
+if(view==='set'){renderSettings();return}
 const M=monthOf(S),{nd,cnt,full,hd,mp}=M,isFull=cnt>0&&mp===1,off=(new Date(vy,vm,1).getDay()+6)%7;
 const mo=PEOPLE.map(p=>monthOf(P[p.id]));let both=0;
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d);if(PEOPLE.every(p=>pctOf(P[p.id],k)===1))both++}
@@ -727,13 +765,15 @@ ${todayCard()}<div class="hero">${twin}${who_}<div class="both">Заполнен
 <button class="link" data-t="1">${showGoals?'Скрыть цели':'Изменить цели'}</button>${showGoals?`<div class="card"><span class="lbl">Цели на день: ${PEOPLE.find(p=>p.id===who).n}</span>${themeForm()}<div class="gl">${goals}</div>${addForm}${datesForm()}</div>`:''}
 <div class="sync">${syncMsg}</div><button class="link" data-x="1">Сменить код доступа</button>`}
 const app=document.getElementById('app');
-app.addEventListener('click',e=>{if(e.target.closest('.sky')){const t=Date.now();skyTaps=(t-skyLast<1500)?skyTaps+1:1;skyLast=t;if(skyTaps>=5){skyTaps=0;egg('star')}return}const b=e.target.closest('button');if(!b)return;
+app.addEventListener('click',e=>{const stp=e.target.closest('[data-star]');if(stp){showDay(stp.dataset.star);return}if(e.target.closest('.sky')){const t=Date.now();skyTaps=(t-skyLast<1500)?skyTaps+1:1;skyLast=t;if(skyTaps>=5){skyTaps=0;egg('star')}return}const b=e.target.closest('button');if(!b)return;
 if(b.dataset.v){view=b.dataset.v;enter();render();window.scrollTo(0,0)}
 else if(b.dataset.hk){who=b.dataset.hw;S=P[who];sel=b.dataset.hk;view='track';save();render();window.scrollTo(0,0)}
 else if(b.dataset.c){const v=document.getElementById('code').value.trim();if(v){CODE=v;try{localStorage.setItem('habits-code',v)}catch(e){}remote=!!(CFG.url&&CFG.key);render();pull()}}
 else if(b.dataset.x){try{localStorage.removeItem('habits-code')}catch(e){}CODE='';remote=false;render()}
 else if(b.dataset.w){who=b.dataset.w;S=P[who];showGoals=false;const l=document.getElementById('love');if(l)l.remove();save();render();pullLove()}
 else if(b.dataset.love){sendLove(b)}
+else if(b.dataset.ui){UI[b.dataset.ui]=UI[b.dataset.ui]?0:1;saveUI();render()}
+else if(b.dataset.quiet){const q=!UI.vib&&!UI.conf&&!UI.anim;UI.vib=UI.conf=UI.anim=q?1:0;saveUI();render()}
 else if(b.dataset.pal){S.theme=b.dataset.pal;save();applyTheme();render()}
 else if(b.dataset.tc){const i=b.dataset.tc==='ty'?4:+b.dataset.tc,k=todayK(),cur=(S.days[k]||[])[i];if(i===4||i===30)setVal(k,i,cur===1?null:1);else{const g=info(S,i).g;setVal(k,i,(cur!=null&&cur>=g)?null:g)}}
 else if(b.dataset.heart){if(heartHeld){heartHeld=false;return}const t=Date.now();heartTaps=(t-heartLast<1800)?heartTaps+1:1;heartLast=t;if(heartTaps>=7){heartTaps=0;egg('rain')}else{heartN++;heartTap=true;render()}}
