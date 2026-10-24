@@ -732,10 +732,14 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="card">${row('vib','Вибрация','Короткая вибрация при закрытом дне, рекорде и сообщениях (Android)')}${row('conf','Конфетти','Праздник на экране при закрытии дня и рекордах')}${row('anim','Анимации','Плавные переходы, кольца и движение сердечка')}${row('splash','Заставка при входе','Кольца и слово «Планер» при открытии')}${row('heart','Сердечко','Талисман в карточке «Сегодня»')}</div>
 <div class="card"><span class="lbl">Отображение</span><div class="szl">Размер текста</div><div class="seg szs">${[['Обычный',0],['Крупнее',1],['Очень крупно',2]].map(([t,v])=>`<button class="${(UI.sz||0)===v?'on':''}" data-sz="${v}">${t}</button>`).join('')}</div>${row('hc','Высокий контраст','Чёрный текст, чёткие рамки: удобнее при ярком свете')}</div>
 <div class="card">${themeForm()}</div>
+${goalsCard()}
 <div class="card"><span class="lbl">Диагностика</span><div class="dgs">${dg('Версия планера',APP_VER)}${dg('Связь',navigator.onLine?'есть':'нет')}${dg('Хранилище',remote?'общая база подключена':'только на этом устройстве')}${dg('Последняя синхронизация',lastSyncText())}${dg('Ждут отправки',pend.length?'записи: '+pend.join(', '):'нет')}${dg('Работа без интернета','<span id="swst">проверяю…</span>')}</div><div class="acts2"><button data-diag="sync">Проверить сейчас</button><button data-diag="reload">Обновить приложение</button></div><div class="note" style="margin:10px 0 0;text-align:left">«Обновить приложение» очищает сохранённую копию страницы и загружает свежую. Ваши записи не удаляются.</div></div>
 <button class="link" data-x="1">Сменить код доступа</button>
 <div class="sync">Настройки хранятся на этом устройстве</div>`;
 if(navigator.serviceWorker)navigator.serviceWorker.getRegistration().then(r=>{const e=document.getElementById('swst');if(e)e.textContent=r&&r.active?'включён':'не включён'}).catch(()=>{const e=document.getElementById('swst');if(e)e.textContent='не поддерживается'});else{const e=document.getElementById('swst');if(e)e.textContent='не поддерживается'}}
+function goalsCard(){const goals=H.map((h,i)=>`<span>${h.n}, ${h.u}</span><input type="number" step="any" min="0" data-g="${i}" value="${S.goals[i]}">`).join('')+`<span>Учиться печатать, раз в неделю</span><input type="number" step="1" min="1" max="7" data-g="4" value="${wg(S)}">`+S.custom.map(c=>`<span>${esc(c.n)}, ${esc(c.u)}</span><input type="number" step="any" min="0" data-cg="${c.id}" value="${c.g}">`).join('');
+const addForm=`<div class="add"><input id="cn" placeholder="Название" maxlength="30"><input id="cu" placeholder="Единица" maxlength="10"><input id="cg" type="number" min="0" step="any" placeholder="Цель"><button class="addb" data-add="1">Добавить привычку</button>${S.custom.map(c=>`<button class="del" data-del="${c.id}">Удалить «${esc(c.n)}»</button>`).join('')}</div>`;
+return `<div class="card"><span class="lbl">Цели на день: ${PEOPLE.find(p=>p.id===who).n}</span><div class="gl">${goals}</div>${addForm}${datesForm()}</div>`}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
@@ -780,8 +784,7 @@ return `<div class="h" style="--hc:var(--c${cc(i)})"><div class="hd"><span class
 <div class="bar"><i style="width:${p*100}%;background:var(--hc)"></i></div>
 <div class="ctl"><button data-i="${i}" data-a="-1" aria-label="Меньше">−</button><input type="number" inputmode="decimal" step="any" min="0" placeholder="0" data-i="${i}" value="${v==null?'':v}" aria-label="${h.n}"><span>${h.u}</span><button data-i="${i}" data-a="1" aria-label="Больше">+</button></div></div>`}).join('')+prepTile()+typingTile();
 const stats=idxsOf(S).map(i=>{const h=info(S,i),den=i===30?M.cntp:cnt,p=den?(hd[i]||0)/den:0;return `<div class="stat"><span>${h.n.split(' ')[0]}</span><div class="bar" style="--hc:var(--c${cc(i)})"><i style="width:${p*100}%;background:var(--c${cc(i)})"></i></div><em>${Math.round(p*100)}%</em></div>`}).join('')+tyStat(M);
-const goals=H.map((h,i)=>`<span>${h.n}, ${h.u}</span><input type="number" step="any" min="0" data-g="${i}" value="${S.goals[i]}">`).join('')+`<span>Учиться печатать, раз в неделю</span><input type="number" step="1" min="1" max="7" data-g="4" value="${wg(S)}">`+S.custom.map(c=>`<span>${esc(c.n)}, ${esc(c.u)}</span><input type="number" step="any" min="0" data-cg="${c.id}" value="${c.g}">`).join('');
-const addForm=`<div class="add"><input id="cn" placeholder="Название" maxlength="30"><input id="cu" placeholder="Единица" maxlength="10"><input id="cg" type="number" min="0" step="any" placeholder="Цель"><button class="addb" data-add="1">Добавить привычку</button>${S.custom.map(c=>`<button class="del" data-del="${c.id}">Удалить «${esc(c.n)}»</button>`).join('')}</div>`;
+
 document.getElementById('app').innerHTML=`
 ${tabs()}
 <div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
@@ -789,8 +792,7 @@ ${todayCard()}<div class="hero">${twin}${who_}<div class="both">Заполнен
 <div class="card"><div class="cal">${cal}</div></div>
 <div class="card"><div class="dayhead"><div><h2>${sd[2]} ${MG[sd[1]-1]}</h2><small>${WD[dt.getDay()]}, ${vals[40]?(vals[40]==='sick'?'болею, день не считается':'выходной, день не считается'):'прогресс дня '+Math.round((dp||0)*100)+'%'+(dp===1?' ✓':'')}</small></div><div class="ringbox${popDay?' pop':''}" style="width:52px;height:52px">${ring(dp||0,52,7,dp===1?'#f1b93a':acc)}</div></div>${restBar()}<div class="${vals[40]?'dim':''}">${rows}</div></div>
 <div class="card"><span class="lbl" style="display:block;margin-bottom:14px">Выполнение за месяц</span><div class="stats">${stats}</div></div>
-<button class="link" data-t="1">${showGoals?'Скрыть цели':'Изменить цели'}</button>${showGoals?`<div class="card"><span class="lbl">Цели на день: ${PEOPLE.find(p=>p.id===who).n}</span>${themeForm()}<div class="gl">${goals}</div>${addForm}${datesForm()}</div>`:''}
-<div class="sync">${syncMsg}</div><button class="link" data-x="1">Сменить код доступа</button>`}
+<div class="sync">${syncMsg}</div>`}
 const app=document.getElementById('app');
 app.addEventListener('click',e=>{const stp=e.target.closest('[data-star]');if(stp){showDay(stp.dataset.star);return}if(e.target.closest('.sky')){const t=Date.now();skyTaps=(t-skyLast<1500)?skyTaps+1:1;skyLast=t;if(skyTaps>=5){skyTaps=0;egg('star')}return}const b=e.target.closest('button');if(!b)return;
 if(b.dataset.v){view=b.dataset.v;enter();render();window.scrollTo(0,0)}
