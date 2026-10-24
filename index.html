@@ -347,18 +347,19 @@ return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}"><circle cx="
 const CFG={url:'https://qffmezdmqmsvunmnzowl.supabase.co',key:'sb_publishable_vovS9yfPQIOAs1xRpLWcRg_rhQgFeMC'};
 try{const h=decodeURIComponent(location.hash.slice(1));if(h){localStorage.setItem('habits-code',h);history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
 let CODE='';try{CODE=localStorage.getItem('habits-code')||''}catch(e){}
-let remote=!!(CFG.url&&CFG.key&&CODE);const dirty={},tms={};
+let remote=!!(CFG.url&&CFG.key&&CODE);let dirty={};try{dirty=JSON.parse(localStorage.getItem('dirty')||'{}')}catch(e){}
+const tms={},pd=()=>{try{localStorage.setItem('dirty',JSON.stringify(dirty))}catch(e){}};
 async function rpc(fn,body){const r=await fetch(CFG.url.replace(/\/rest\/v1\/?$/,'').replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:Object.assign({'Content-Type':'application/json',apikey:CFG.key},CFG.key.startsWith('sb_')?{}:{Authorization:'Bearer '+CFG.key}),body:JSON.stringify(body)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null}
 const setSync=m=>{syncMsg=m;const e=document.querySelector('.sync');if(e)e.textContent=m};
-function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(async()=>{try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:{goals:P[w].goals,days:P[w].days,custom:P[w].custom,nid:P[w].nid,v2:P[w].v2,dates:P[w].dates,theme:P[w].theme}});delete dirty[w];setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — сохранено на устройстве, отправится позже')}},500)}
+function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(async()=>{try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:{goals:P[w].goals,days:P[w].days,custom:P[w].custom,nid:P[w].nid,v2:P[w].v2,dates:P[w].dates,theme:P[w].theme}});delete dirty[w];pd();setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — сохранено на устройстве, отправится позже')}},500)}
 function save(w=who){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
-if(remote){dirty[w]=1;push(w)}}
+if(remote){dirty[w]=1;pd();push(w)}}
 async function pull(){if(!remote)return;let changed=false;
 try{for(const p of PEOPLE){const r=await rpc('get_tracker',{p_code:CODE+':'+p.id});
-if(dirty[p.id]){push(p.id);continue}
+if(dirty[p.id]){if(r&&r.days){P[p.id].days={...r.days,...P[p.id].days};changed=true}push(p.id);continue}
 if(r&&r.days){const n={goals:r.goals||P[p.id].goals,days:r.days,custom:r.custom||[],nid:r.nid||0,v2:r.v2,dates:r.dates||[],theme:r.theme};const mg=fixD(n);if(JSON.stringify(n)!==JSON.stringify(P[p.id])){P[p.id]=n;changed=true}
-if(mg){dirty[p.id]=1;push(p.id)}}
-else if(Object.keys(P[p.id].days).length){dirty[p.id]=1;push(p.id)}}
+if(mg){dirty[p.id]=1;pd();push(p.id)}}
+else if(Object.keys(P[p.id].days).length){dirty[p.id]=1;pd();push(p.id)}}
 S=P[who];checkSecrets(true);if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
 if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
@@ -802,6 +803,8 @@ else if(t.dataset.cg!=null){const v=parseFloat(t.value),c=S.custom.find(x=>x.id=
 else if(t.dataset.i!=null){const v=t.value===''?null:Math.max(0,parseFloat(t.value)||0);setVal(sel,+t.dataset.i,v)}});
 render();
 checkSecrets(true);
+addEventListener('online',()=>pull());addEventListener('offline',()=>setSync('Нет связи: записи сохраняются на устройстве'));
+if(!navigator.onLine)setSync('Нет связи: записи сохраняются на устройстве');
 (()=>{const q=new URLSearchParams(location.search).get('a');if(!q)return;try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
 if(!CODE)return;
 if(q==='prep'){sel=todayK();view='track';if((S.days[sel]||[])[30]!==1)setVal(sel,30,1);else render();toast('<b>Подготовка к парам</b><span>Отмечено на сегодня ✓</span>')}
