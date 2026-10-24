@@ -287,6 +287,23 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-of
 .trow .seg{flex:1;min-width:0}
 .gear{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--text) 7%,transparent);color:var(--mute)}
 .gear.on{background:var(--card);color:var(--text);box-shadow:0 2px 10px rgba(60,50,130,.12)}
+html.sz1 body{zoom:1.12}
+html.sz2 body{zoom:1.25}
+html.sz2 .tabs button{font-size:11px}
+.szl{margin:14px 0 8px;font-size:14px;font-weight:700}
+.szs{margin-bottom:6px}
+.dgs{margin-top:8px}
+.dg{display:flex;justify-content:space-between;gap:12px;padding:11px 0;font-size:14px;border-bottom:1px solid color-mix(in srgb,var(--text) 8%,transparent)}
+.dg:last-child{border-bottom:0}
+.dg span{color:var(--mute);font-weight:600}
+.dg b{text-align:right;font-weight:700}
+.acts2{display:flex;gap:8px;margin-top:12px}
+.acts2 button{flex:1;height:46px;border-radius:16px;background:var(--cell);font-weight:700;font-size:13px}
+:root.hc{--text:#000;--mute:#33334a;--track:#c3c3d8;--cell:#e3e3f0}
+@media(prefers-color-scheme:dark){:root.hc:not([data-theme="light"]){--text:#fff;--mute:#dcdcf2;--card:#000;--cell:#1b1b2e;--track:#4a4a68;--bg:#000}}
+:root[data-theme="dark"].hc{--text:#fff;--mute:#dcdcf2;--card:#000;--cell:#1b1b2e;--track:#4a4a68;--bg:#000}
+.hc .card,.hc .h,.hc .mc-bubble{outline:2px solid color-mix(in srgb,var(--text) 40%,transparent)}
+.hc body{font-weight:700}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -351,7 +368,7 @@ let CODE='';try{CODE=localStorage.getItem('habits-code')||''}catch(e){}
 let remote=!!(CFG.url&&CFG.key&&CODE);let dirty={};try{dirty=JSON.parse(localStorage.getItem('dirty')||'{}')}catch(e){}
 const tms={},pd=()=>{try{localStorage.setItem('dirty',JSON.stringify(dirty))}catch(e){}};
 async function rpc(fn,body){const r=await fetch(CFG.url.replace(/\/rest\/v1\/?$/,'').replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:Object.assign({'Content-Type':'application/json',apikey:CFG.key},CFG.key.startsWith('sb_')?{}:{Authorization:'Bearer '+CFG.key}),body:JSON.stringify(body)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null}
-const setSync=m=>{syncMsg=m;const e=document.querySelector('.sync');if(e)e.textContent=m};
+const setSync=m=>{syncMsg=m;if(m.startsWith('Синхронизировано')){try{localStorage.setItem('lastsync',String(Date.now()))}catch(e){}}const e=document.querySelector('.sync');if(e)e.textContent=m};
 function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(async()=>{try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:{goals:P[w].goals,days:P[w].days,custom:P[w].custom,nid:P[w].nid,v2:P[w].v2,dates:P[w].dates,theme:P[w].theme}});delete dirty[w];pd();setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — сохранено на устройстве, отправится позже')}},500)}
 function save(w=who){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
 if(remote){dirty[w]=1;pd();push(w)}}
@@ -701,18 +718,24 @@ return `<div class="wp"><b>${p.n}</b><span>${pc==null?'—':Math.round(pc*100)+'
 const e=document.createElement('div');e.id='mcard';
 e.innerHTML=`<button class="mcbg" data-mx="1" aria-label="Закрыть"></button><div class="mcb"><div class="lbl" style="font:600 18px var(--fd);color:var(--text)">${a[2]} ${MG[a[1]-1]}, ${WD[dt.getDay()]}</div><div class="note" style="margin:6px 0 0;text-align:left">${st}</div><div class="wsm">${cols.join('')}</div><button class="cls" data-mx="1">Закрыть</button></div>`;
 document.body.appendChild(e)}
-let UI={vib:1,conf:1,splash:1,heart:1,anim:1};try{UI={...UI,...JSON.parse(localStorage.getItem('cfg')||'{}')}}catch(e){}
-const applyUI=()=>document.documentElement.classList.toggle('noanim',!UI.anim);
+let UI={vib:1,conf:1,splash:1,heart:1,anim:1,hc:0,sz:0};try{UI={...UI,...JSON.parse(localStorage.getItem('cfg')||'{}')}}catch(e){}
+const applyUI=()=>{const r=document.documentElement.classList;r.toggle('noanim',!UI.anim);r.toggle('hc',!!UI.hc);r.remove('sz1','sz2');if(UI.sz)r.add('sz'+UI.sz)};
 const saveUI=()=>{try{localStorage.setItem('cfg',JSON.stringify(UI))}catch(e){}applyUI()};
 applyUI();
-function renderSettings(){const row=(k,t,d)=>`<button class="sw ${UI[k]?'on':''}" data-ui="${k}"><span><b>${t}</b><small>${d}</small></span><i></i></button>`,quiet=!UI.vib&&!UI.conf&&!UI.anim;
+const APP_VER='2026.10.24-7';
+function lastSyncText(){let t=0;try{t=+localStorage.getItem('lastsync')||0}catch(e){}if(!t)return 'ещё не было';const d=new Date(t),tm=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});return (d.toDateString()===new Date().toDateString()?'сегодня':d.getDate()+' '+MG[d.getMonth()])+', '+tm}
+function renderSettings(){const row=(k,t,d)=>`<button class="sw ${UI[k]?'on':''}" data-ui="${k}"><span><b>${t}</b><small>${d}</small></span><i></i></button>`,quiet=!UI.vib&&!UI.conf&&!UI.anim,
+pend=Object.keys(dirty).map(id=>PEOPLE.find(p=>p.id===id)).filter(Boolean).map(p=>p.n),dg=(a,b)=>`<div class="dg"><span>${a}</span><b>${b}</b></div>`;
 document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><h1 style="margin:0 auto">Настройки</h1></div>
 <button class="mcbtn" data-quiet="1">${quiet?'Выключить тихий режим':'Тихий режим: без вибрации, конфетти и анимаций'}</button>
 <div class="card">${row('vib','Вибрация','Короткая вибрация при закрытом дне, рекорде и сообщениях (Android)')}${row('conf','Конфетти','Праздник на экране при закрытии дня и рекордах')}${row('anim','Анимации','Плавные переходы, кольца и движение сердечка')}${row('splash','Заставка при входе','Кольца и слово «Планер» при открытии')}${row('heart','Сердечко','Талисман в карточке «Сегодня»')}</div>
+<div class="card"><span class="lbl">Отображение</span><div class="szl">Размер текста</div><div class="seg szs">${[['Обычный',0],['Крупнее',1],['Очень крупно',2]].map(([t,v])=>`<button class="${(UI.sz||0)===v?'on':''}" data-sz="${v}">${t}</button>`).join('')}</div>${row('hc','Высокий контраст','Чёрный текст, чёткие рамки: удобнее при ярком свете')}</div>
 <div class="card">${themeForm()}</div>
+<div class="card"><span class="lbl">Диагностика</span><div class="dgs">${dg('Версия планера',APP_VER)}${dg('Связь',navigator.onLine?'есть':'нет')}${dg('Хранилище',remote?'общая база подключена':'только на этом устройстве')}${dg('Последняя синхронизация',lastSyncText())}${dg('Ждут отправки',pend.length?'записи: '+pend.join(', '):'нет')}${dg('Работа без интернета','<span id="swst">проверяю…</span>')}</div><div class="acts2"><button data-diag="sync">Проверить сейчас</button><button data-diag="reload">Обновить приложение</button></div><div class="note" style="margin:10px 0 0;text-align:left">«Обновить приложение» очищает сохранённую копию страницы и загружает свежую. Ваши записи не удаляются.</div></div>
 <button class="link" data-x="1">Сменить код доступа</button>
-<div class="sync">Настройки хранятся на этом устройстве</div>`}
+<div class="sync">Настройки хранятся на этом устройстве</div>`;
+if(navigator.serviceWorker)navigator.serviceWorker.getRegistration().then(r=>{const e=document.getElementById('swst');if(e)e.textContent=r&&r.active?'включён':'не включён'}).catch(()=>{const e=document.getElementById('swst');if(e)e.textContent='не поддерживается'});else{const e=document.getElementById('swst');if(e)e.textContent='не поддерживается'}}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
@@ -776,6 +799,8 @@ else if(b.dataset.c){const v=document.getElementById('code').value.trim();if(v){
 else if(b.dataset.x){try{localStorage.removeItem('habits-code')}catch(e){}CODE='';remote=false;render()}
 else if(b.dataset.w){who=b.dataset.w;S=P[who];showGoals=false;const l=document.getElementById('love');if(l)l.remove();save();render();pullLove()}
 else if(b.dataset.love){sendLove(b)}
+else if(b.dataset.sz){UI.sz=+b.dataset.sz;saveUI();render()}
+else if(b.dataset.diag){if(b.dataset.diag==='sync'){setSync('Проверяю…');pull().then(()=>{if(view==='set')render()})}else{(async()=>{try{const rs=await navigator.serviceWorker.getRegistrations();rs.forEach(r=>r.unregister());const ks=await caches.keys();ks.forEach(k=>caches.delete(k))}catch(e){}location.reload()})()}}
 else if(b.dataset.ui){UI[b.dataset.ui]=UI[b.dataset.ui]?0:1;saveUI();render()}
 else if(b.dataset.quiet){const q=!UI.vib&&!UI.conf&&!UI.anim;UI.vib=UI.conf=UI.anim=q?1:0;saveUI();render()}
 else if(b.dataset.pal){S.theme=b.dataset.pal;save();applyTheme();render()}
