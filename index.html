@@ -334,13 +334,14 @@ const num=n=>String(n).replace('.',',');
 const big=n=>Number(n).toLocaleString('ru-RU').replace(/\u00a0/g,' ');
 const gfmt=i=>{const h=info(S,i);return h.u==='шагов'?big(h.g):num(h.g)};
 const PREP_FROM='2026-10-18';
+const isSat=k=>{const a=k.split('-').map(Number);return new Date(a[0],a[1]-1,a[2]).getDay()===6};
 const idxsOf=D=>[0,1,2,3,30,...D.custom.map(c=>7+c.id)];
 const cc=i=>i<4?i:i===30?5:5+(i-7)%3;
 const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 function info(D,i){if(i===30)return{n:'Подготовка к парам',u:'',g:1,s:1};if(i<4)return{n:H[i].n,u:H[i].u,g:D.goals[i],s:H[i].s};const c=D.custom.find(x=>x.id===i-7)||{n:'?',u:'',g:1};return{n:c.n,u:c.u,g:c.g,s:c.g>=1000?1000:c.g>=100?100:c.g>=10?1:.5}}
-function pctOf(D,k){const v=D.days[k]||[];if(v[40])return null;const ix=idxsOf(D).filter(i=>i!==30||k>=PREP_FROM);if(!ix.some(i=>v[i]!=null))return null;return ix.filter(i=>v[i]!=null&&v[i]>=info(D,i).g).length/ix.length}
+function pctOf(D,k){const v=D.days[k]||[];if(v[40])return null;const ix=idxsOf(D).filter(i=>i!==30||(k>=PREP_FROM&&!isSat(k)));if(!ix.some(i=>v[i]!=null))return null;return ix.filter(i=>v[i]!=null&&v[i]>=info(D,i).g).length/ix.length}
 function monthOf(D){const nd=new Date(vy,vm+1,0).getDate();let sum=0,cnt=0,full=0,ty=0,cntp=0;const hd={},ix=idxsOf(D);
-for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(D,k);if((D.days[k]||[])[4]===1)ty++;if(p!=null){sum+=p;cnt++;if(k>=PREP_FROM)cntp++;if(p===1)full++;ix.forEach(i=>{if(i===30&&k<PREP_FROM)return;const x=D.days[k][i];if(x!=null&&x>=info(D,i).g)hd[i]=(hd[i]||0)+1})}}
+for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(D,k);if((D.days[k]||[])[4]===1)ty++;if(p!=null){sum+=p;cnt++;if(k>=PREP_FROM&&!isSat(k))cntp++;if(p===1)full++;ix.forEach(i=>{if(i===30&&(k<PREP_FROM||isSat(k)))return;const x=D.days[k][i];if(x!=null&&x>=info(D,i).g)hd[i]=(hd[i]||0)+1})}}
 return{nd,cnt,cntp,full,hd,ty,mp:cnt?sum/cnt:0}}
 function ring(p,sz,sw,col){const r=(sz-sw)/2,c=2*Math.PI*r,m=sz/2;
 return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}"><circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${m}" cy="${m}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${m} ${m})"/>`:''}</svg>`}
@@ -377,7 +378,7 @@ const wg=D=>D.goals[4]||3;
 const raz=n=>[2,3,4].includes(n)?'раза':'раз';
 function weekKeys(k){const a=k.split('-').map(Number),dt=new Date(a[0],a[1]-1,a[2]),mon=(dt.getDay()+6)%7;
 return Array.from({length:7},(_,j)=>{const x=new Date(a[0],a[1]-1,a[2]-mon+j);return key(x.getFullYear(),x.getMonth(),x.getDate())})}
-function prepTile(){const done=(S.days[sel]||[])[30]===1;
+function prepTile(){if(isSat(sel))return '';const done=(S.days[sel]||[])[30]===1;
 return `<div class="h" style="--hc:var(--c5)"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/></svg></span><div class="ht"><b>Подготовка к парам</b><small>отметка раз в день</small></div><span class="ok">${done?'✓':''}</span></div><button class="tg ${done?'on':''}" data-pr="1">${done?'Подготовка сделана ✓':'Отметить подготовку'}</button></div>`}
 function restBar(){const r=(S.days[sel]||[])[40]||null;return `<div class="seg rest">${[[null,'Обычный'],['sick','🤒 Болею'],['off','🌴 Выходной']].map(([v,t])=>`<button class="${r===v?'on':''}" data-rest="${v||'none'}">${t}</button>`).join('')}</div>`}
 function typingTile(){const wk=weekKeys(sel),isOn=k=>(S.days[k]||[])[4]===1,wc=wk.filter(isOn).length,tg=wg(S),done=isOn(sel);
@@ -510,7 +511,7 @@ for(let x=new Date(a);x<=b&&x<=td;x.setDate(x.getDate()+1))out.push(key(x.getFul
 function wrapStats(type){const keys=wrapKeys(type),f=k=>{const a=k.split('-').map(Number);return a[2]+' '+MG[a[1]-1]};
 const per=PEOPLE.map(p=>{const D=P[p.id],ix=idxsOf(D);let n=0,full=0,sum=0,eng=0,rd=0,steps=0,ty=0,prep=0,rest=0;const hit={},tot={};
 keys.forEach(k=>{const v=D.days[k]||[];if(v[40])rest++;if(v[4]===1)ty++;if(v[30]===1&&k>=PREP_FROM)prep++;const pc=pctOf(D,k);if(pc==null)return;n++;sum+=pc;if(pc===1)full++;eng+=v[0]||0;rd+=v[1]||0;steps+=v[2]||0;
-ix.forEach(i=>{if(i===30&&k<PREP_FROM)return;tot[i]=(tot[i]||0)+1;if(v[i]!=null&&v[i]>=info(D,i).g)hit[i]=(hit[i]||0)+1})});
+ix.forEach(i=>{if(i===30&&(k<PREP_FROM||isSat(k)))return;tot[i]=(tot[i]||0)+1;if(v[i]!=null&&v[i]>=info(D,i).g)hit[i]=(hit[i]||0)+1})});
 let bh=null;ix.forEach(i=>{if(!tot[i]||tot[i]<3)return;const r=(hit[i]||0)/tot[i];if(!bh||r>bh.r)bh={r,n:info(D,i).n}});
 return{p,n,full,avg:n?sum/n:0,eng,rd,steps,km:steps*.00075,ty,prep,rest,bh,streak:runBest(keys,k=>(D.days[k]||[])[40]?null:pctOf(D,k)===1)}});
 const tg2=k=>{const st=PEOPLE.map(p=>(P[p.id].days[k]||[])[40]?null:pctOf(P[p.id],k)===1).filter(x=>x!==null);return st.length?st.every(Boolean):null};
@@ -602,7 +603,7 @@ const HACC=['<path d="M34 24Q60-10 86 24Z" fill="#6fb3ff"/><rect x="32" y="22" w
 '<path d="M34 24Q48-10 86 6Q76 14 86 24Z" fill="#e5383b"/><rect x="32" y="22" width="56" height="8" rx="4" fill="#fff"/><circle cx="88" cy="6" r="6" fill="#fff"/>'];
 let heartN=0,heartTap=false,heartMsg=null,heartFx=null,heartTaps=0,heartLast=0,heartHeld=false;
 function heartHtml(){const D=S,tk=todayK(),v=D.days[tk]||[],pc=pctOf(D,tk),both=PEOPLE.every(p=>pctOf(P[p.id],tk)===1),m=now.getMonth(),[c1,c2]=HP[S.theme]||HCOL[m];
-const n=idxsOf(D).filter(i=>i!==30||tk>=PREP_FROM).length,met=Math.round((pc||0)*n);
+const n=idxsOf(D).filter(i=>i!==30||(tk>=PREP_FROM&&!isSat(tk))).length,met=Math.round((pc||0)*n);
 const hol=holidayToday(),st=v[40]?'sleep':hol?'happy':pc===1?'happy':pc!=null?'part':'miss',pick=a=>a[heartN%a.length];
 if(hol&&!v[40]){let seen=null;try{seen=localStorage.getItem('hol-'+tk)}catch(e){}if(!seen){try{localStorage.setItem('hol-'+tk,'1')}catch(e){}setTimeout(()=>{burst();buzz()},700)}}
 const msg={happy:both?['Вы оба закрыли день! Я такой счастливый','Двойная победа сегодня!']:['Ура! Всё выполнено! Горжусь тобой','Вот это день! Я прыгаю от радости'],
@@ -682,7 +683,7 @@ function checkRecord(k,i,v){if(i>2||v==null||v<=0||(S.days[k]||[])[40])return;le
 const f='rec-'+who+'-'+k+'-'+i;try{if(localStorage.getItem(f))return;localStorage.setItem(f,'1')}catch(e){}
 toast(`<b>Новый рекорд! 🎉</b><span>${info(S,i).n}: ${i===2?big(v):num(v)}. Он уже в Зале славы</span>`);setTimeout(burst,120);buzz()}
 function todayCard(){const D=S,tk=todayK(),v=D.days[tk]||[],dp=pctOf(D,tk),dt=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-const items=[...idxsOf(D).filter(i=>i!==30||tk>=PREP_FROM).map(i=>({i,n:['Англ.','Чтение','Шаги','Сон'][i]||(i===30?'Пары':info(D,i).n.slice(0,7)),ic:ICONS[i]||(i===30?'<path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/>':ICONS[4]),c:cc(i)})),{i:4,n:'Печать',ic:KB,c:4}];
+const items=[...idxsOf(D).filter(i=>i!==30||(tk>=PREP_FROM&&!isSat(tk))).map(i=>({i,n:['Англ.','Чтение','Шаги','Сон'][i]||(i===30?'Пары':info(D,i).n.slice(0,7)),ic:ICONS[i]||(i===30?'<path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/>':ICONS[4]),c:cc(i)})),{i:4,n:'Печать',ic:KB,c:4}];
 const st=x=>{const val=v[x.i];if(x.i===4||x.i===30)return val===1?'done':'';if(val==null)return '';return val>=info(D,x.i).g?'done':val>0?'part':''};
 const rem=items.filter(x=>x.i!==4&&st(x)!=='done').length;
 return `<div class="card today"><div class="tdh"><div><b>Сегодня</b><small>${dt.getDate()} ${MG[dt.getMonth()]}${v[40]?', день отдыха':rem?`, осталось ${rem}`:', всё выполнено'}</small></div><div class="ringbox${popDay?' pop':''}" style="width:52px;height:52px">${ring(v[40]?0:(dp||0),52,7,dp===1?'#f1b93a':'var(--acc)')}<b>${v[40]?'—':Math.round((dp||0)*100)+'%'}</b></div></div>
