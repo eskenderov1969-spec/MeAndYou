@@ -311,6 +311,14 @@ html.sz2 .tabs button{font-size:11px}
 .rd.on i{color:#fff}
 .sch{margin-top:14px}
 .sch .del{margin-top:6px;text-align:left;padding:0 14px}
+.ico{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;flex:none}
+.ach span .ico{margin-right:2px}
+.fr b .ico{vertical-align:-3px;margin-right:2px}
+#nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:min(calc(100% - 24px),440px);z-index:40;display:flex;gap:2px;padding:6px;border-radius:26px;background:color-mix(in srgb,var(--card) 86%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 10px 30px rgba(60,50,130,.18)}
+#nav button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 6px;border-radius:20px;background:none;color:var(--mute);font-size:10.5px;font-weight:700;transition:background .2s,color .2s}
+#nav button.on{color:var(--text);background:color-mix(in srgb,var(--acc) 22%,transparent)}
+#nav button.on .ico{color:var(--acc)}
+.wrap{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -390,7 +398,7 @@ if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
 setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
 function setVal(k,i,v){const was=pctOf(S,k);checkRecord(k,i,v);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){popDay=true;setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render();popDay=false;checkSecrets()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
-const tabs=()=>`<div class="trow"><div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v||(v==='hist'&&view==='fame')?'on':''}">${t}</button>`).join('')}</div><button class="gear ${view==='set'?'on':''}" data-v="set" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div>`;
+const tabs=()=>'';
 const short=(i,x)=>H[i].u==='шагов'?(x>=1000?(x/1000).toFixed(1).replace('.',',').replace(',0','')+'к':String(x)):num(x);
 function arc(cx,cy,r,sw,p,col,op){const c=2*Math.PI*r;return `<g opacity="${op}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--track)" stroke-width="${sw}"/>${p>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c*Math.min(p,1)} ${c}" transform="rotate(-90 ${cx} ${cy})"/>`:''}</g>`}
 function burst(){if(!UI.conf||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))return;
@@ -407,7 +415,7 @@ if(!cl.length)return `<div class="h" style="--hc:var(--c5)"><div class="hd"><spa
 return `<div class="h" style="--hc:var(--c5)"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24">${ic}</svg></span><div class="ht"><b>Подготовка к парам</b><small>завтра, ${dw}: пар ${cl.length}</small></div><span class="ok">${dn===cl.length?'✓':''}</span></div><div class="rdl">${cl.map(c=>rdBtn(c,t,r)).join('')}</div><span class="wkt">Готово ${dn} из ${cl.length}</span></div>`}
 if(isSat(sel))return '';const done=(S.days[sel]||[])[30]===1;
 return `<div class="h" style="--hc:var(--c5)"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/></svg></span><div class="ht"><b>Подготовка к парам</b><small>отметка раз в день</small></div><span class="ok">${done?'✓':''}</span></div><button class="tg ${done?'on':''}" data-pr="1">${done?'Подготовка сделана ✓':'Отметить подготовку'}</button></div>`}
-function restBar(){const r=(S.days[sel]||[])[40]||null;return `<div class="seg rest">${[[null,'Обычный'],['sick','🤒 Болею'],['off','🌴 Выходной']].map(([v,t])=>`<button class="${r===v?'on':''}" data-rest="${v||'none'}">${t}</button>`).join('')}</div>`}
+function restBar(){const r=(S.days[sel]||[])[40]||null;return `<div class="seg rest">${[[null,'Обычный'],['sick',ic('therm',15)+' Болею'],['off',ic('cup',15)+' Выходной']].map(([v,t])=>`<button class="${r===v?'on':''}" data-rest="${v||'none'}">${t}</button>`).join('')}</div>`}
 function typingTile(){const wk=weekKeys(sel),isOn=k=>(S.days[k]||[])[4]===1,wc=wk.filter(isOn).length,tg=wg(S),done=isOn(sel);
 return `<div class="h" style="--hc:var(--c4)"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24">${KB}</svg></span><div class="ht"><b>Учиться печатать</b><small>цель ${tg} ${raz(tg)} в неделю</small></div><span class="ok">${wc>=tg?'✓':''}</span></div>
 <div class="wk">${wk.map((k,j)=>`<i class="${isOn(k)?'on':''} ${k===sel?'cur':''}">${['П','В','С','Ч','П','С','В'][j]}</i>`).join('')}</div>
@@ -435,7 +443,7 @@ const wcards=PEOPLE.map(p=>{const w=wsum(P[p.id],wk),tg=wg(P[p.id]);
 return `<div class="wp"><b>${p.n}</b>${w?`<span>${Math.round(w.avg*100)}% в среднем</span><span>Лучший день: ${w.best}</span><span>Дней со 100%: ${w.full}</span>${w.weak?`<span>Слабее всего: ${esc(w.weak)}</span>`:'<span>Слабых мест нет ✓</span>'}<i>Печать: ${w.ty} из ${tg}</i>`:'<i>Нет данных за неделю</i>'}</div>`}).join('');
 const tot=Object.keys(D.days).filter(k=>pctOf(D,k)===1).length,sb=streaks(k=>rst(D,k)?null:pctOf(D,k)===1).best,tg=wg(D);
 const tyw=Object.keys(D.days).some(k=>weekKeys(k).filter(x=>(D.days[x]||[])[4]===1).length>=tg);
-const ach=[['🌱','Первый день на 100%',tot>=1],['🔥','7 дней подряд',sb>=7],['⚡','14 дней подряд',sb>=14],['🏆','30 дней подряд',sb>=30],['💯','25 дней со 100%',tot>=25],['⌨️','Неделя печати',tyw],['🤝','7 дней вместе',tog.best>=7]];
+const ach=[['sprout','Первый день на 100%',tot>=1],['flame','7 дней подряд',sb>=7],['bolt','14 дней подряд',sb>=14],['trophy','30 дней подряд',sb>=30],['target','25 дней со 100%',tot>=25],['kb','Неделя печати',tyw],['heart','7 дней вместе',tog.best>=7]];
 document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><button class="nav" data-m="-1" aria-label="Предыдущий месяц">‹</button><h1>${MN[vm]} ${vy}</h1><button class="nav" data-m="1" aria-label="Следующий месяц">›</button></div>
 <div class="who">${PEOPLE.map(p=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc};--pd:${p.deep}"><b>${p.n}</b></button>`).join('')}</div>
@@ -443,10 +451,10 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="card"><span class="lbl">Серии подряд со 100%</span><div class="stk">${stk.map(x=>`<div class="sb"><i>${x.n}</i><b>${x.cur}</b><span>дн. подряд</span><span>рекорд ${x.best}</span></div>`).join('')}</div></div>
 <div class="card"><span class="lbl">Итоги недели ${f(wk[0])} – ${f(wk[6])}</span><div class="wsm">${wcards}</div><div class="wkn"><button data-wk="-7" aria-label="Прошлая неделя">‹</button><small style="color:var(--mute);font-weight:600">неделя выбранного дня</small><button data-wk="7" aria-label="Следующая неделя">›</button></div></div>
 <div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).filter(i=>i!==30).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Тёмный столбик: цель выполнена.</div></div>
-<div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}</div>${secBlock(D)}${secNote(D)}</div>
+<div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${ic(a[0])} ${a[1]}</span>`).join('')}</div>${secBlock(D)}${secNote(D)}</div>
 <div class="sync">${syncMsg}</div>`}
 const buzz=()=>{if(!UI.vib)return;try{navigator.vibrate&&navigator.vibrate([50,40,90])}catch(e){}};
-const loveBtn=()=>{const o=PEOPLE.find(p=>p.id!==who);return `<button class="lovebtn" data-love="1">❤ Отправить сердечко ${o.dat}</button>`};
+const loveBtn=()=>{const o=PEOPLE.find(p=>p.id!==who);return `<button class="lovebtn" data-love="1">${ic('heart',16,1)} Отправить сердечко ${o.dat}</button>`};
 async function sendLove(btn){const me=PEOPLE.find(p=>p.id===who);
 if(!remote){btn.textContent='Нужна связь с базой';return}
 btn.disabled=true;
@@ -455,7 +463,7 @@ catch(e){btn.textContent='Не отправилось, попробуй ещё'}
 setTimeout(()=>{if(view==='track')render()},2500)}
 function showLove(o,t){let e=document.getElementById('love');if(!e){e=document.createElement('button');e.id='love';document.body.appendChild(e)}
 const d=new Date(t),tm=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}),td=d.toDateString()===new Date().toDateString();
-e.innerHTML=`<span class="hh">❤</span><span><b>${o.n} тебя любит</b><small>${td?'сегодня':d.getDate()+' '+MG[d.getMonth()]}, ${tm}. Нажми, чтобы закрыть</small></span>`;
+e.innerHTML=`<span class="hh">${ic('heart',30,1)}</span><span><b>${o.n} тебя любит</b><small>${td?'сегодня':d.getDate()+' '+MG[d.getMonth()]}, ${tm}. Нажми, чтобы закрыть</small></span>`;
 e.onclick=()=>{try{localStorage.setItem('love-seen-'+who,String(t))}catch(x){}e.remove()};buzz()}
 async function pullLove(){if(!remote)return;const o=PEOPLE.find(p=>p.id!==who);
 try{const r=await rpc('get_tracker',{p_code:CODE+':love-'+o.id});if(r&&r.t){let seen=0;try{seen=+localStorage.getItem('love-seen-'+who)||0}catch(e){}if(r.t>seen)showLove(o,r.t)}}catch(e){}}
@@ -596,26 +604,26 @@ const rs=(D,k)=>(D.days[k]||[])[40];
 function weeksOf(D){const ks=Object.keys(D.days).sort();if(!ks.length)return[];const a=weekKeys(ks[0])[0].split('-').map(Number),b=weekKeys(ks[ks.length-1])[0],out=[];
 for(let d=new Date(a[0],a[1]-1,a[2]);;d.setDate(d.getDate()+7)){const w=key(d.getFullYear(),d.getMonth(),d.getDate());out.push(weekKeys(w));if(w>=b)break}return out}
 const SEC=[
-['sun','🌅','Пять воскресений подряд',D=>runBest(weeksOf(D).map(w=>w[6]),k=>rs(D,k)?null:pctOf(D,k)===1)>=5],
-['sleep','😴','Неделя крепкого сна',D=>weeksOf(D).some(w=>w.every(k=>{const v=(D.days[k]||[])[3];return v!=null&&v>=D.goals[3]}))],
-['perfw','✨','Идеальная неделя',D=>weeksOf(D).some(w=>w.every(k=>!rs(D,k)&&pctOf(D,k)===1))],
-['10k','🚀','Десять тысяч шагов за день',D=>Object.values(D.days).some(v=>(v[2]||0)>=10000)],
-['duo3','🎓','Три урока за день',D=>Object.values(D.days).some(v=>(v[0]||0)>=3)],
-['type4','⌨️','Печатная машинка',D=>weeksOf(D).some(w=>w.filter(k=>(D.days[k]||[])[4]===1).length>=4)],
-['wknd','🌗','Идеальные выходные',D=>weeksOf(D).some(w=>pctOf(D,w[5])===1&&pctOf(D,w[6])===1)],
-['nogap','🧩','Месяц без пропусков',D=>{const ms={};Object.keys(D.days).forEach(k=>{ms[k.slice(0,7)]=1});return Object.keys(ms).some(m=>{const[y,mo]=m.split('-').map(Number);if(y===now.getFullYear()&&mo===now.getMonth()+1)return false;const nd=new Date(y,mo,0).getDate();for(let d=1;d<=nd;d++){const k=key(y,mo-1,d);if(pctOf(D,k)==null&&!rs(D,k))return false}return true})}],
-['tog10','🤝','Десять дней вместе',()=>Object.keys(P.emir.days).filter(k=>PEOPLE.every(p=>pctOf(P[p.id],k)===1)).length>=10],
-['egg','🥚',()=>who==='emir'?'Нашёл секрет сердечка':'Нашла секрет сердечка',()=>{try{return !!localStorage.getItem('egg-'+who)}catch(e){return false}}]];
+['sun','sun','Пять воскресений подряд',D=>runBest(weeksOf(D).map(w=>w[6]),k=>rs(D,k)?null:pctOf(D,k)===1)>=5],
+['sleep','moon','Неделя крепкого сна',D=>weeksOf(D).some(w=>w.every(k=>{const v=(D.days[k]||[])[3];return v!=null&&v>=D.goals[3]}))],
+['perfw','spark','Идеальная неделя',D=>weeksOf(D).some(w=>w.every(k=>!rs(D,k)&&pctOf(D,k)===1))],
+['10k','rocket','Десять тысяч шагов за день',D=>Object.values(D.days).some(v=>(v[2]||0)>=10000)],
+['duo3','cap','Три урока за день',D=>Object.values(D.days).some(v=>(v[0]||0)>=3)],
+['type4','kb','Печатная машинка',D=>weeksOf(D).some(w=>w.filter(k=>(D.days[k]||[])[4]===1).length>=4)],
+['wknd','half','Идеальные выходные',D=>weeksOf(D).some(w=>pctOf(D,w[5])===1&&pctOf(D,w[6])===1)],
+['nogap','puzzle','Месяц без пропусков',D=>{const ms={};Object.keys(D.days).forEach(k=>{ms[k.slice(0,7)]=1});return Object.keys(ms).some(m=>{const[y,mo]=m.split('-').map(Number);if(y===now.getFullYear()&&mo===now.getMonth()+1)return false;const nd=new Date(y,mo,0).getDate();for(let d=1;d<=nd;d++){const k=key(y,mo-1,d);if(pctOf(D,k)==null&&!rs(D,k))return false}return true})}],
+['tog10','heart','Десять дней вместе',()=>Object.keys(P.emir.days).filter(k=>PEOPLE.every(p=>pctOf(P[p.id],k)===1)).length>=10],
+['egg','egg',()=>who==='emir'?'Нашёл секрет сердечка':'Нашла секрет сердечка',()=>{try{return !!localStorage.getItem('egg-'+who)}catch(e){return false}}]];
 const secOpen=D=>SEC.filter(x=>x[3](D));
 const nm=x=>typeof x[2]==='function'?x[2]():x[2];
-const secChips=D=>secOpen(D).map(x=>`<span class="sec">${x[1]} ${nm(x)}</span>`).join('');
+const secChips=D=>secOpen(D).map(x=>`<span class="sec">${ic(x[1])} ${nm(x)}</span>`).join('');
 const secBlock=D=>{const c=secChips(D);return c?`<span class="lbl" style="display:block;margin-top:16px">Секретные</span><div class="ach">${c}</div>`:''};
 const secNote=D=>{const n=SEC.length-secOpen(D).length;return n?`<div class="note" style="margin:10px 0 0">Секретных достижений ещё не открыто: ${n}</div>`:''};
 function toast(h){let e=document.getElementById('secret');if(!e){e=document.createElement('button');e.id='secret';document.body.appendChild(e);e.onclick=()=>e.remove()}e.innerHTML=h;clearTimeout(e._t);e._t=setTimeout(()=>e.remove(),6000)}
 function checkSecrets(silent){if(!CODE)return;const ids=secOpen(S).map(x=>x[0]);let old=null;try{old=JSON.parse(localStorage.getItem('sec-'+who))}catch(e){}
 try{localStorage.setItem('sec-'+who,JSON.stringify(ids))}catch(e){}
 if(silent||old===null)return;const nw=ids.filter(i=>!old.includes(i));
-if(nw.length){const x=SEC.find(y=>y[0]===nw[0]);toast(`<b>Секретное достижение!</b><span>${x[1]} ${nm(x)}</span>`);buzz()}}
+if(nw.length){const x=SEC.find(y=>y[0]===nw[0]);toast(`<b>Секретное достижение!</b><span>${ic(x[1],16)} ${nm(x)}</span>`);buzz()}}
 const HCOL=[['#ff9fb5','#f0587d'],['#ff8fab','#e63e6d'],['#ffa6c9','#ec6aa5'],['#ffa3b8','#f0627f'],['#ff9ec4','#e8589a'],['#ff9aa8','#f0506b'],['#ff9bb0','#e94a69'],['#ffa8b9','#e8607a'],['#ff9fb2','#d9566f'],['#ff9db0','#e8506a'],['#f79ac0','#c9457f'],['#ff8f9f','#d63a55']];
 const HACC=['<path d="M34 24Q60-10 86 24Z" fill="#6fb3ff"/><rect x="32" y="22" width="56" height="8" rx="4" fill="#fff"/><circle cx="60" cy="-4" r="6" fill="#fff"/>',
 '<path d="M30 80Q60 96 90 80L88 90Q60 106 32 90Z" fill="#ff6b81"/><rect x="76" y="88" width="11" height="20" rx="4" fill="#ff6b81"/>',
@@ -666,11 +674,11 @@ if(x)return x.t==='bd'?{msg:x.n===PEOPLE.find(q=>q.id===who).n?`С днём ро
 if(m===3&&d===8)return{msg:'С 8 Марта! Пусть день будет нежным, как цветы',acc:ACC_8,deco:DECO_8};
 if((m===12&&d===31)||(m===1&&d<=2))return{msg:m===12?'Завтра Новый год! Загадывайте желания':'С Новым годом! Пусть будет много тёплых дней',acc:HACC[11],deco:DECO_NY};
 return null}
-function datesForm(){return `<div class="add" style="margin-top:24px"><span class="lbl" style="grid-column:1/-1">Особые даты: дни рождения и памятные дни</span><input id="dn" placeholder="Имя или название" maxlength="30"><input id="dd" type="date" style="grid-column:span 2"><select id="dt"><option value="bd">День рождения</option><option value="sp">Особый день</option></select><button class="addb" data-adddate="1">Добавить дату</button>${(S.dates||[]).map(x=>`<button class="del" data-deldate="${x.id}">${x.t==='bd'?'🎂':'💞'} ${esc(x.n)}, ${x.d}.${String(x.m).padStart(2,'0')} · Удалить</button>`).join('')}</div>`}
+function datesForm(){return `<div class="add" style="margin-top:24px"><span class="lbl" style="grid-column:1/-1">Особые даты: дни рождения и памятные дни</span><input id="dn" placeholder="Имя или название" maxlength="30"><input id="dd" type="date" style="grid-column:span 2"><select id="dt"><option value="bd">День рождения</option><option value="sp">Особый день</option></select><button class="addb" data-adddate="1">Добавить дату</button>${(S.dates||[]).map(x=>`<button class="del" data-deldate="${x.id}">${x.t==='bd'?ic('gift',15):ic('heart',15)} ${esc(x.n)}, ${x.d}.${String(x.m).padStart(2,'0')} · Удалить</button>`).join('')}</div>`}
 let skyTaps=0,skyLast=0,hl=null;
 function rain(){if(!UI.conf)return;const e=['❤','💗','💖','✨'];for(let i=0;i<28;i++){const d=document.createElement('div');d.className='rain';d.textContent=e[i%4];d.style.cssText=`left:${Math.random()*96}vw;animation-duration:${1.8+Math.random()*1.6}s;animation-delay:${Math.random()*.6}s;font-size:${16+Math.random()*16}px`;document.body.appendChild(d);setTimeout(()=>d.remove(),4400)}}
 function egg(kind){try{localStorage.setItem('egg-'+who,'1')}catch(e){}
-if(kind==='star'){const sk=document.querySelector('.sky');if(sk){const s=document.createElement('div');s.className='shoot';sk.appendChild(s);setTimeout(()=>s.remove(),1300)}toast('<b>Падающая звезда</b><span>Загадай желание ✨</span>');checkSecrets();return}
+if(kind==='star'){const sk=document.querySelector('.sky');if(sk){const s=document.createElement('div');s.className='shoot';sk.appendChild(s);setTimeout(()=>s.remove(),1300)}toast('<b>Падающая звезда</b><span>Загадай желание</span>');checkSecrets();return}
 if(kind==='rain'){heartFx='spin';heartMsg='Секрет найден! Я люблю вас обоих';rain();buzz()}else{heartFx='hug';heartMsg='Ой, как приятно! Обними меня ещё'}
 render();checkSecrets()}
 document.addEventListener('pointerdown',ev=>{if(!ev.target.closest('.mc-heart'))return;heartHeld=false;clearTimeout(hl);hl=setTimeout(()=>{heartHeld=true;egg('hug')},800)});
@@ -684,22 +692,22 @@ let mo=null;const mm={};ks.forEach(k=>{const p=pctOf(D,k);if(p==null)return;(mm[
 Object.keys(mm).forEach(m=>{if(mm[m].length<7)return;const av=mm[m].reduce((x,y)=>x+y,0)/mm[m].length;if(!mo||av>mo.v)mo={v:av,k:m+'-01'}});
 return{steps:mx(2),eng:mx(0),rd:mx(1),streak:best,week:wk,month:mo,ty,full:ks.filter(k=>pctOf(D,k)===1).length}}
 function renderFame(){const R=PEOPLE.map(p=>recOf(P[p.id])),r1=v=>num(Math.round(v*10)/10);
-const row=(ic,t,fn)=>`<div class="card fr"><b>${ic} ${t}</b><div class="frc">${PEOPLE.map((p,i)=>{const o=fn(R[i]);return `<div><span style="color:${p.deep}">${p.n}</span><strong>${o?o[0]:'—'}</strong><small>${o?o[1]:'пока нет'}</small>${o&&o[2]&&(new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(o[2]))/864e5<=7?'<em class="nw">новый</em>':''}</div>`}).join('')}</div></div>`;
+const row=(n,t,fn)=>`<div class="card fr"><b>${ic(n,17)} ${t}</b><div class="frc">${PEOPLE.map((p,i)=>{const o=fn(R[i]);return `<div><span style="color:${p.deep}">${p.n}</span><strong>${o?o[0]:'—'}</strong><small>${o?o[1]:'пока нет'}</small>${o&&o[2]&&(new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(o[2]))/864e5<=7?'<em class="nw">новый</em>':''}</div>`}).join('')}</div></div>`;
 const all=[...new Set(PEOPLE.flatMap(p=>Object.keys(P[p.id].days)))].sort();let tr=0,tb=null,both=0;const bm={};
 if(all.length){const a=all[0].split('-').map(Number),z=all[all.length-1];for(let d=new Date(a[0],a[1]-1,a[2]);;d.setDate(d.getDate()+1)){const k=key(d.getFullYear(),d.getMonth(),d.getDate());if(k>z)break;const v=tgf(k);if(v===null)continue;if(v){tr++;if(!tb||tr>tb.v)tb={v:tr,k};if(PEOPLE.every(p=>pctOf(P[p.id],k)===1)){both++;bm[k.slice(0,7)]=(bm[k.slice(0,7)]||0)+1}}else tr=0}}
 const bmx=Object.entries(bm).sort((a,b)=>b[1]-a[1])[0],km=PEOPLE.reduce((a,p)=>a+Object.values(P[p.id].days).reduce((s,v)=>s+(v[2]||0),0),0)*.00075;
 document.getElementById('app').innerHTML=`${tabs()}
 <div class="top"><button class="nav" data-v="hist" aria-label="Назад в историю">‹</button><h1>Зал славы</h1><span style="width:40px"></span></div>
 <div class="note" style="margin:0">Что у нас получалось. Без соревнования: просто рекорды друг друга рядом.</div>
-${row('👟','Больше всего шагов за день',r=>r.steps&&[big(r.steps.v),fd(r.steps.k),r.steps.k])}
-${row('🎓','Больше всего уроков за день',r=>r.eng&&[r1(r.eng.v),fd(r.eng.k),r.eng.k])}
-${row('📖','Дольше всего с книгой за день',r=>r.rd&&[r1(r.rd.v)+' ч',fd(r.rd.k),r.rd.k])}
-${row('🔥','Самая долгая серия',r=>r.streak&&[r.streak.v+' дн.','до '+fd(r.streak.k)])}
-${row('🌟','Лучшая неделя',r=>r.week&&[Math.round(r.week.v*100)+'%',fd(r.week.k)+' – '+fd(r.week.e)])}
-${row('📅','Лучший месяц',r=>r.month&&[Math.round(r.month.v*100)+'%',MN[+r.month.k.slice(5,7)-1]+' '+r.month.k.slice(0,4)])}
-${row('⌨️','Занятий печатью за неделю',r=>r.ty&&[r.ty.v+'',fd(r.ty.k)])}
-${row('💯','Всего дней со 100%',r=>[r.full+' дн.','за всё время'])}
-<div class="card fr frt"><b>🤝 Наши общие рекорды</b><div class="frc"><div><span>Серия вместе</span><strong>${tb?tb.v+' дн.':'—'}</strong><small>${tb?'до '+fd(tb.k):'пока нет'}</small></div><div><span>Дней со 100% вместе</span><strong>${both}</strong><small>за всё время</small></div><div><span>Лучший месяц вместе</span><strong>${bmx?bmx[1]+' дн.':'—'}</strong><small>${bmx?MN[+bmx[0].slice(5)-1]+' '+bmx[0].slice(0,4):'пока нет'}</small></div><div><span>Прошли вместе</span><strong>${r1(km)} км</strong><small>по шагам</small></div></div></div>
+${row('steps','Больше всего шагов за день',r=>r.steps&&[big(r.steps.v),fd(r.steps.k),r.steps.k])}
+${row('chat','Больше всего уроков за день',r=>r.eng&&[r1(r.eng.v),fd(r.eng.k),r.eng.k])}
+${row('book','Дольше всего с книгой за день',r=>r.rd&&[r1(r.rd.v)+' ч',fd(r.rd.k),r.rd.k])}
+${row('flame','Самая долгая серия',r=>r.streak&&[r.streak.v+' дн.','до '+fd(r.streak.k)])}
+${row('star','Лучшая неделя',r=>r.week&&[Math.round(r.week.v*100)+'%',fd(r.week.k)+' – '+fd(r.week.e)])}
+${row('cal','Лучший месяц',r=>r.month&&[Math.round(r.month.v*100)+'%',MN[+r.month.k.slice(5,7)-1]+' '+r.month.k.slice(0,4)])}
+${row('kb','Занятий печатью за неделю',r=>r.ty&&[r.ty.v+'',fd(r.ty.k)])}
+${row('target','Всего дней со 100%',r=>[r.full+' дн.','за всё время'])}
+<div class="card fr frt"><b>${ic('heart',17)} Наши общие рекорды</b><div class="frc"><div><span>Серия вместе</span><strong>${tb?tb.v+' дн.':'—'}</strong><small>${tb?'до '+fd(tb.k):'пока нет'}</small></div><div><span>Дней со 100% вместе</span><strong>${both}</strong><small>за всё время</small></div><div><span>Лучший месяц вместе</span><strong>${bmx?bmx[1]+' дн.':'—'}</strong><small>${bmx?MN[+bmx[0].slice(5)-1]+' '+bmx[0].slice(0,4):'пока нет'}</small></div><div><span>Прошли вместе</span><strong>${r1(km)} км</strong><small>по шагам</small></div></div></div>
 <div class="sync">${syncMsg}</div>`}
 const HP={mint:['#8fe0c0','#2fb089'],sunset:['#ffb38a','#f0605a'],night:['#d3b8ff','#7a5af0']};
 const PALS=[['lav','Лаванда','#b7a6f0'],['mint','Мята','#8fe0c0'],['sunset','Закат','#ffb38a'],['night','Ночь','#2d2866']];
@@ -709,7 +717,7 @@ let popDay=false,enT=null;
 function enter(){const a=document.getElementById('app');a.classList.add('enter');clearTimeout(enT);enT=setTimeout(()=>a.classList.remove('enter'),1300)}
 function checkRecord(k,i,v){if(i>2||v==null||v<=0||(S.days[k]||[])[40])return;let mx=0,n=0;Object.keys(S.days).forEach(d=>{if(d===k)return;const x=(S.days[d]||[])[i];if(x!=null&&!rs(S,d)){n++;if(x>mx)mx=x}});if(n<5||v<=mx)return;
 const f='rec-'+who+'-'+k+'-'+i;try{if(localStorage.getItem(f))return;localStorage.setItem(f,'1')}catch(e){}
-toast(`<b>Новый рекорд! 🎉</b><span>${info(S,i).n}: ${i===2?big(v):num(v)}. Он уже в Зале славы</span>`);setTimeout(burst,120);buzz()}
+toast(`<b>${ic('trophy',16)} Новый рекорд!</b><span>${info(S,i).n}: ${i===2?big(v):num(v)}. Он уже в Зале славы</span>`);setTimeout(burst,120);buzz()}
 function todayCard(){const D=S,tk=todayK(),v=D.days[tk]||[],dp=pctOf(D,tk),dt=new Date(now.getFullYear(),now.getMonth(),now.getDate());
 const items=[...idxsOf(D).filter(i=>i!==30||prepNeed(D,tk)).map(i=>({i,n:['Англ.','Чтение','Шаги','Сон'][i]||(i===30?'Пары':info(D,i).n.slice(0,7)),ic:ICONS[i]||(i===30?'<path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/>':ICONS[4]),c:cc(i)})),{i:4,n:'Печать',ic:KB,c:4}];
 const st=x=>{const val=v[x.i];if(x.i===30){const pv=prepVal(D,tk);return pv===1?'done':pv===0?'part':''}if(x.i===4)return val===1?'done':'';if(val==null)return '';return val>=info(D,x.i).g?'done':val>0?'part':''};
@@ -769,13 +777,49 @@ function scheduleCard(){const dn={1:'Понедельник',2:'Вторник',
 const list=order.map(d=>{const cl=(S.sched||[]).filter(c=>c.d===d).sort((a,b)=>(a.t||'99').localeCompare(b.t||'99'));return cl.length?`<div class="sch"><span class="lbl">${dn[d]}</span>${cl.map(c=>`<button class="del" data-delsch="${c.id}">${c.t?c.t+' · ':''}${esc(c.n)} · Удалить</button>`).join('')}</div>`:''}).join('');
 return `<div class="card"><span class="lbl">Расписание пар: ${PEOPLE.find(p=>p.id===who).n}</span><div class="note" style="text-align:left;margin:6px 0 0">Вечером планер покажет пары на завтра, и подготовка отмечается по каждому предмету. Если расписание пустое, остаётся одна общая отметка.</div>
 <div class="add" style="margin-top:14px"><select id="sd">${order.map(d=>`<option value="${d}">${dn[d]}</option>`).join('')}</select><input id="st" type="time"><input id="sn" placeholder="Предмет" maxlength="30" style="grid-column:span 2"><button class="addb" data-addsch="1">Добавить пару</button></div>${list}</div>`}
+const ICP={
+home:'<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+bars:'<path d="M5 20V10M12 20V4M19 20v-7"/>',
+spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M18.5 16.5v3M17 18h3"/>',
+clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+sliders:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+sprout:'<path d="M12 20v-8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 14c0-3-2.5-5-6-5 0 3 2.5 5 6 5z"/>',
+flame:'<path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>',
+bolt:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/>',
+target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8"/>',
+kb:'<rect x="3" y="7" width="18" height="11" rx="2.5"/><path d="M7 11h.01M11 11h.01M15 11h.01M8 15h8"/>',
+heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>',
+moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+rocket:'<path d="M12 3c3 2 5 5 5 9l-2 3H9l-2-3c0-4 2-7 5-9z"/><circle cx="12" cy="10" r="1.5"/><path d="M9 15l-2 4 3-1M15 15l2 4-3-1"/>',
+cap:'<path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4"/>',
+half:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
+puzzle:'<path d="M5 9h3a2 2 0 1 1 4 0h3v3a2 2 0 1 1 0 4v3H5z"/>',
+egg:'<path d="M12 3c-3.5 0-6 5.5-6 10a6 6 0 0 0 12 0c0-4.5-2.5-10-6-10z"/><path d="M8.5 14c1 1.2 2 1.5 3.5 1.5s2.5-.3 3.5-1.5"/>',
+therm:'<path d="M10 14.5V5a2 2 0 1 1 4 0v9.5a4 4 0 1 1-4 0z"/><path d="M12 9v7"/>',
+cup:'<path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11h2a2 2 0 0 1 0 4h-2M8 3v3M12 3v3"/>',
+steps:'<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>',
+chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+book:'<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>',
+star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+gift:'<rect x="4" y="9" width="16" height="11" rx="2"/><path d="M12 9v11M4 13h16M12 9c-2-4-6-3-5 0 .6 1.6 3 1 5 0zM12 9c2-4 6-3 5 0-.6 1.6-3 1-5 0z"/>'};
+const ic=(n,s=18,f)=>`<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true"${f?' style="fill:currentColor"':''}>${ICP[n]||''}</svg>`;
+const NAVS=[['track','Планер','home'],['stats','Статистика','bars'],['sky','Небо','spark'],['hist','История','clock'],['set','Настройки','sliders']];
+function updateNav(){let n=document.getElementById('nav');if(!CODE){if(n)n.remove();return}
+if(!n){n=document.createElement('nav');n.id='nav';document.body.appendChild(n)}
+const cur=view==='fame'?'hist':view;
+n.innerHTML=NAVS.map(([v,t,i])=>`<button data-v="${v}" class="${cur===v?'on':''}" aria-label="${t}">${ic(i,22)}<span>${t}</span></button>`).join('')}
+document.addEventListener('click',ev=>{const b=ev.target.closest('#nav button');if(!b)return;view=b.dataset.v;enter();render();window.scrollTo(0,0)});
+function render(){render0();updateNav()}
 function renderHist(){
 const nd=new Date(vy,vm+1,0).getDate(),last=new Date(vy,vm,1)>now?0:(vy===now.getFullYear()&&vm===now.getMonth()?now.getDate():nd);
 const DW=['вс','пн','вт','ср','чт','пт','сб'];
 const cell=(p,k)=>{const D=P[p.id],v=D.days[k]||[],pc=pctOf(D,k);
-if(v&&v[40])return `<button class="hc" data-hw="${p.id}" data-hk="${k}"><i>${v[40]==='sick'?'🤒 болею':'🌴 выходной'}</i></button>`;
+if(v&&v[40])return `<button class="hc" data-hw="${p.id}" data-hk="${k}"><i>${v[40]==='sick'?ic('therm',12)+' болею':ic('cup',12)+' выходной'}</i></button>`;
 if(pc==null)return `<button class="hc" data-hw="${p.id}" data-hk="${k}"><i>нет данных</i></button>`;
-return `<button class="hc ${pc===1?'full':''}" data-hw="${p.id}" data-hk="${k}"><b>${Math.round(pc*100)}%${pc===1?' ✓':''}</b><span>${v.slice(0,4).map((x,i)=>x==null?'<u>–</u>':`<u class="${x>=D.goals[i]?'ok':''}">${short(i,x)}</u>`).join('')}${v[4]===1?'<u class="ok">⌨</u>':''}${prepNeed(D,k)&&prepVal(D,k)===1?'<u class="ok">📝</u>':''}</span></button>`};
+return `<button class="hc ${pc===1?'full':''}" data-hw="${p.id}" data-hk="${k}"><b>${Math.round(pc*100)}%${pc===1?' ✓':''}</b><span>${v.slice(0,4).map((x,i)=>x==null?'<u>–</u>':`<u class="${x>=D.goals[i]?'ok':''}">${short(i,x)}</u>`).join('')}${v[4]===1?'<u class="ok">'+ic('kb',12)+'</u>':''}${prepNeed(D,k)&&prepVal(D,k)===1?'<u class="ok">'+ic('cap',12)+'</u>':''}</span></button>`};
 let rows='';for(let d=last;d>=1;d--){const k=key(vy,vm,d);
 rows+=`<div class="hr"><div class="hdt"><b>${d}</b><small>${DW[new Date(vy,vm,d).getDay()]}</small></div>${PEOPLE.map(p=>cell(p,k)).join('')}</div>`}
 const sum=PEOPLE.map(p=>{const m=monthOf(P[p.id]);return `<div class="mini"><div class="ringbox" style="width:64px;height:64px">${ring(m.mp,64,8,p.acc)}<b>${Math.round(m.mp*100)}%</b></div><span>${p.n}: ${m.full} дн. со 100%</span></div>`}).join('');
@@ -789,7 +833,7 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="note">Порядок: английский, чтение, шаги, сон. Зелёным выделена выполненная цель. Нажми на день, чтобы открыть его в планере.</div>
 ${rows||'<div class="note">В этом месяце ещё нет дней</div>'}</div>
 <div class="sync">${syncMsg}</div>`}
-function render(){
+function render0(){
 if(!CODE){document.getElementById('app').innerHTML='<div class="card" style="margin-top:18vh;text-align:center"><h2 style="margin:0 0 6px;font-size:19px">Планер</h2><p style="color:var(--mute);font-size:14px;margin:0">Введите код доступа — один раз на этом устройстве</p><div class="ctl" style="margin-top:16px"><input id="code" type="password" autocomplete="off" placeholder="код"><button data-c="1">→</button></div></div>';return}
 const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setProperty('--acc',acc);applyTheme();
 if(view==='hist'){renderHist();return}
@@ -806,7 +850,7 @@ return arc(cx,85,64,15,mo[ix].mp,col,sel?1:.55)+`<text x="${cx}" y="94" text-anc
 const who_=`<div class="who">${PEOPLE.map((p,ix)=>`<button class="${p.id===who?'on':''}" data-w="${p.id}" style="--pc:${p.acc};--pd:${p.deep}"><b>${p.n}</b><small>${mo[ix].full} дн. со 100%</small></button>`).join('')}</div>`;
 let cal=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(x=>`<div class="dow">${x}</div>`).join('')+'<div class="d e"></div>'.repeat(off);
 for(let d=1;d<=nd;d++){const k=key(vy,vm,d),p=pctOf(S,k);
-cal+=`<button class="d ${p===1?'full':''} ${(S.days[k]||[])[40]?'rest':''} ${(S.days[k]||[])[4]===1?'ty':''} ${k===sel?'sel':''} ${k===todayK()?'now':''}" style="--p:${Math.round((p||0)*100)}%" data-k="${k}"><span>${d}</span>${(S.days[k]||[])[40]?`<i class="ri">${S.days[k][40]==='sick'?'🤒':'🌴'}</i>`:''}</button>`}
+cal+=`<button class="d ${p===1?'full':''} ${(S.days[k]||[])[40]?'rest':''} ${(S.days[k]||[])[4]===1?'ty':''} ${k===sel?'sel':''} ${k===todayK()?'now':''}" style="--p:${Math.round((p||0)*100)}%" data-k="${k}"><span>${d}</span>${(S.days[k]||[])[40]?`<i class="ri">${S.days[k][40]==='sick'?ic('therm',11):ic('cup',11)}</i>`:''}</button>`}
 const sd=sel.split('-').map(Number),dt=new Date(sd[0],sd[1]-1,sd[2]),vals=S.days[sel]||[],dp=pctOf(S,sel);
 const rows=idxsOf(S).filter(i=>i!==30).map(i=>{const h=info(S,i),v=vals[i],g=h.g,p=v==null?0:Math.min(v/g,1),ok=v!=null&&v>=g;
 return `<div class="h" style="--hc:var(--c${cc(i)})"><div class="hd"><span class="ic"><svg viewBox="0 0 24 24">${ICONS[i]||ICONS[4]}</svg></span><div class="ht"><b>${h.n}</b><small>цель ${gfmt(i)} ${h.u}</small></div><span class="ok">${ok?'✓':''}</span></div>
