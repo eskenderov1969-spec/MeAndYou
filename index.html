@@ -16,8 +16,8 @@
 <style>
 :root{--bg:#f4f2fb;--card:#fff;--cell:#eceaf6;--track:#e4e1f1;--text:#2a2650;--mute:#857fa6;--gold:#fde7a6;--goldd:#f1b93a;--goldtxt:#7a5a10;--okc:#2f8f68;--c0:#7c9cf5;--c1:#b58cf0;--c2:#f5a56b;--c3:#4fc8b0;--c4:#5bb8f0;--c5:#e86f9a;--c6:#f0c24b;--c7:#8b7cf0;--acc:#6f9cf0;--shadow:0 10px 30px rgba(60,50,130,.10);--fd:"Unbounded","Manrope",system-ui,sans-serif;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15132b;--card:#201d3d;--cell:#2a2650;--track:#34305c;--text:#ebe9fb;--mute:#9a94c2;--gold:#5c4a1e;--goldtxt:#ffe3a0;--okc:#7fe0b6;--shadow:0 10px 30px rgba(0,0,0,.3)}}
-:root[data-theme="dark"]{--bg:#15132b;--card:#201d3d;--cell:#2a2650;--track:#34305c;--text:#ebe9fb;--mute:#9a94c2;--gold:#5c4a1e;--goldtxt:#ffe3a0;--okc:#7fe0b6;--shadow:0 10px 30px rgba(0,0,0,.3)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0b1c;--card:#15142a;--cell:#1d1c38;--track:#2b2a50;--text:#eceafc;--mute:#9694c2;--gold:#5c4a1e;--goldtxt:#ffe3a0;--okc:#7fe0b6;--shadow:0 0 0 1px rgba(255,255,255,.05),0 14px 36px rgba(0,0,0,.55)}}
+:root[data-theme="dark"]{--bg:#0c0b1c;--card:#15142a;--cell:#1d1c38;--track:#2b2a50;--text:#eceafc;--mute:#9694c2;--gold:#5c4a1e;--goldtxt:#ffe3a0;--okc:#7fe0b6;--shadow:0 0 0 1px rgba(255,255,255,.05),0 14px 36px rgba(0,0,0,.55)}
 html{scroll-padding-top:env(safe-area-inset-top,0px);overflow-x:hidden}
 *{box-sizing:border-box}
 body{margin:0;overflow-x:hidden;max-width:100vw;background:color-mix(in srgb,var(--acc) 10%,var(--bg));color:var(--text);font-family:"Manrope",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;transition:background .5s;min-height:100vh}
@@ -311,6 +311,23 @@ html.sz2 .tabs button{font-size:11px}
 .rd.on i{color:#fff}
 .sch{margin-top:14px}
 .sch .del{margin-top:6px;text-align:left;padding:0 14px}
+.ch svg{height:auto;touch-action:pan-y;overflow:visible}
+.ch{position:relative}
+.tip{position:absolute;top:62px;transform:translate(-50%,-100%);background:var(--text);color:var(--card);font-size:11px;font-weight:700;padding:5px 9px;border-radius:10px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:3}
+.tip.on{opacity:1}
+.cl{transition:filter .3s}
+html.dk body{background:radial-gradient(120% 55% at 50% -8%,color-mix(in srgb,var(--acc) 16%,transparent),transparent 65%),var(--bg) fixed}
+html.dk .ringbox svg,html.dk .twin{filter:drop-shadow(0 0 8px color-mix(in srgb,var(--acc) 45%,transparent))}
+html.dk .d.full{box-shadow:0 0 14px rgba(241,185,58,.35)}
+html.dk .tci.done{box-shadow:0 0 14px color-mix(in srgb,var(--hc) 55%,transparent)}
+html.dk .h{background:color-mix(in srgb,var(--hc) 16%,var(--card))}
+html.dk .bar i{box-shadow:0 0 10px color-mix(in srgb,var(--hc,var(--acc)) 50%,transparent)}
+html.dk .who button.on{box-shadow:0 0 22px color-mix(in srgb,var(--pd) 55%,transparent)}
+html.dk .seg button.on{background:color-mix(in srgb,var(--acc) 24%,var(--card))}
+html.dk .mc-heart svg{filter:drop-shadow(0 0 12px rgba(255,110,150,.35))}
+html.dk .cl{filter:drop-shadow(0 0 5px color-mix(in srgb,currentColor 0%,rgba(255,255,255,.18)))}
+html.dk .nav{box-shadow:0 0 0 1px rgba(255,255,255,.06)}
+html.dk .sw.on i{box-shadow:0 0 12px color-mix(in srgb,var(--acc) 55%,transparent)}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -422,10 +439,27 @@ function wsum(D,wk){const ix=idxsOf(D).filter(i=>i!==30),ps=wk.map(k=>pctOf(D,k)
 let bi=0;ps.forEach((x,i)=>{if(x!=null&&(ps[bi]==null||x>ps[bi]))bi=i});
 const rate=ix.map(i=>{const n=wk.filter(k=>(D.days[k]||[])[i]!=null);return{i,n:n.length,r:n.length?n.filter(k=>D.days[k][i]>=info(D,i).g).length/n.length:1}}).filter(x=>x.n).sort((a,b)=>a.r-b.r);
 return{avg:have.reduce((a,b)=>a+b,0)/have.length,best:['пн','вт','ср','чт','пт','сб','вс'][bi],full:ps.filter(x=>x===1).length,weak:rate[0]&&rate[0].r<1?info(D,rate[0].i).n:null,ty:wk.filter(k=>(D.days[k]||[])[4]===1).length}}
-function bars(D,i,nd){const h=info(D,i),mx=h.g*1.6;let sv='',sum=0,c=0;
-for(let d=1;d<=nd;d++){const v=(D.days[key(vy,vm,d)]||[])[i];if(v==null)continue;sum+=v;c++;const ht=Math.max(3,Math.min(1,v/mx)*50);sv+=`<rect x="${(d-1)*10+1}" y="${54-ht}" width="8" height="${ht}" rx="3" fill="var(--c${cc(i)})" opacity="${v>=h.g?1:.45}"/>`}
-const gy=54-Math.min(1,h.g/mx)*50,a=c?sum/c:0,pl=(n,x,y,z)=>{n=Math.abs(n)%100;const k=n%10;return n>10&&n<20?z:k===1?x:k>1&&k<5?y:z};
-return `<div class="ch"><div class="chh"><b>${h.n}</b><small>${c?'среднее '+(h.u==='шагов'?big(Math.round(a)):num(Math.round(a*10)/10))+' '+(h.u==='урок'?pl(Math.round(a),'урок','урока','уроков'):h.u):'нет данных'}</small></div><svg viewBox="0 0 ${nd*10} 56" preserveAspectRatio="none"><line x1="0" x2="${nd*10}" y1="${gy}" y2="${gy}" stroke="var(--mute)" stroke-dasharray="3 4" opacity=".6"/>${sv}</svg></div>`}
+const plr=(n,x,y,z)=>{n=Math.abs(n)%100;const k=n%10;return n>10&&n<20?z:k===1?x:k>1&&k<5?y:z};
+function smooth(P){if(!P.length)return '';let d=`M${P[0][0].toFixed(1)} ${P[0][1].toFixed(1)}`;
+for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||p2,lo=Math.min(p1[1],p2[1]),hi=Math.max(p1[1],p2[1]),cl=y=>Math.min(hi,Math.max(lo,y));
+d+=`C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${cl(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${cl(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`}return d}
+function bars(D,i,nd){const h=info(D,i),W=300,H=92,pl_=14,pr=10,top=10,base=72,pts=[];let sum=0,c=0,mxv=h.g;
+for(let d=1;d<=nd;d++){const v=(D.days[key(vy,vm,d)]||[])[i];if(v==null)continue;sum+=v;c++;if(v>mxv)mxv=v;pts.push({d,v})}
+const tp=mxv*1.12||1,X=d=>pl_+(d-1)/Math.max(1,nd-1)*(W-pl_-pr),Y=v=>base-Math.min(1,v/tp)*(base-top),P=pts.map(o=>[X(o.d),Y(o.v)]),col=`var(--c${cc(i)})`,gy=Y(h.g),a=c?sum/c:0;
+const un=v=>h.u==='урок'?plr(Math.round(v),'урок','урока','уроков'):h.u,fmt=v=>i===2?big(Math.round(v))+' шагов':num(Math.round(v*10)/10)+' '+un(v);
+window.CHP=window.CHP||{};CHP[i]=pts.map((o,j)=>[P[j][0],P[j][1],o.d+' '+MG[vm].slice(0,3)+': '+fmt(o.v)]);
+const line=P.length>1?smooth(P):'',area=line?`${line}L${P[P.length-1][0].toFixed(1)} ${base}L${P[0][0].toFixed(1)} ${base}Z`:'';
+const ticks=[1,8,15,22,29].filter(d=>d<=nd).map(d=>`<text x="${X(d).toFixed(1)}" y="87" text-anchor="middle" font-size="8" font-weight="700" fill="var(--mute)">${d}</text>`).join('');
+return `<div class="ch"><div class="chh"><b>${h.n}</b><small>${c?'среднее '+(i===2?big(Math.round(a)):num(Math.round(a*10)/10))+' '+(i===2?'шагов':un(a)):'нет данных'}</small></div><svg viewBox="0 0 ${W} ${H}" data-ch="${i}" role="img" aria-label="${h.n}"><defs><linearGradient id="lg${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${col};stop-opacity:.4"/><stop offset="1" style="stop-color:${col};stop-opacity:0"/></linearGradient></defs><line x1="${pl_}" x2="${W-pr}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="var(--mute)" stroke-dasharray="3 4" opacity=".55"/>${area?`<path d="${area}" fill="url(#lg${i})"/>`:''}${line?`<path class="cl" d="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`:''}${P.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.3" fill="${col}"/>`).join('')}<line class="gl" y1="${top-4}" y2="${base}" stroke="${col}" stroke-opacity=".5" style="display:none"/><circle class="gd" r="4.5" fill="var(--card)" stroke="${col}" stroke-width="2.4" style="display:none"/>${ticks}</svg><div class="tip"></div></div>`}
+function chTip(ev){const sv=ev.target.closest&&ev.target.closest('svg[data-ch]');
+document.querySelectorAll('.tip.on').forEach(t=>{if(!sv||t.parentNode!==sv.parentNode)t.classList.remove('on')});
+if(!sv)return;const pts=window.CHP&&CHP[sv.dataset.ch];if(!pts||!pts.length)return;const r=sv.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width*300;
+let b=pts[0];pts.forEach(p=>{if(Math.abs(p[0]-x)<Math.abs(b[0]-x))b=p});
+const tip=sv.parentNode.querySelector('.tip'),gl=sv.querySelector('.gl'),gd=sv.querySelector('.gd');
+gl.setAttribute('x1',b[0]);gl.setAttribute('x2',b[0]);gl.style.display='';gd.setAttribute('cx',b[0]);gd.setAttribute('cy',b[1]);gd.style.display='';
+tip.textContent=b[2];tip.style.left=Math.min(Math.max(b[0]/300*100,20),80)+'%';tip.classList.add('on')}
+document.addEventListener('pointerdown',chTip);
+document.addEventListener('pointermove',ev=>{if(ev.pointerType==='mouse'||ev.pressure>0||ev.buttons)chTip(ev)});
 function renderStats(){
 const acc=PEOPLE.find(p=>p.id===who).acc,D=S,nd=new Date(vy,vm+1,0).getDate();
 const rst=(D,k)=>(D.days[k]||[])[40],tg2=k=>{const st=PEOPLE.map(p=>rst(P[p.id],k)?null:pctOf(P[p.id],k)===1).filter(x=>x!==null);return st.length?st.every(Boolean):null},tog=streaks(tg2);
@@ -442,7 +476,7 @@ document.getElementById('app').innerHTML=`${tabs()}
 <button class="mcbtn" data-mc="1">Карточка месяца</button>
 <div class="card"><span class="lbl">Серии подряд со 100%</span><div class="stk">${stk.map(x=>`<div class="sb"><i>${x.n}</i><b>${x.cur}</b><span>дн. подряд</span><span>рекорд ${x.best}</span></div>`).join('')}</div></div>
 <div class="card"><span class="lbl">Итоги недели ${f(wk[0])} – ${f(wk[6])}</span><div class="wsm">${wcards}</div><div class="wkn"><button data-wk="-7" aria-label="Прошлая неделя">‹</button><small style="color:var(--mute);font-weight:600">неделя выбранного дня</small><button data-wk="7" aria-label="Следующая неделя">›</button></div></div>
-<div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).filter(i=>i!==30).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Тёмный столбик: цель выполнена.</div></div>
+<div class="card"><span class="lbl">Динамика: ${PEOPLE.find(p=>p.id===who).n}</span>${idxsOf(D).filter(i=>i!==30).map(i=>bars(D,i,nd)).join('')}<div class="note" style="margin:12px 0 0">Пунктир — цель. Коснись графика, чтобы увидеть значение за день.</div></div>
 <div class="card"><span class="lbl">Достижения: ${PEOPLE.find(p=>p.id===who).n}</span><div class="ach">${ach.map(a=>`<span class="${a[2]?'':'lock'}">${a[0]} ${a[1]}</span>`).join('')}</div>${secBlock(D)}${secNote(D)}</div>
 <div class="sync">${syncMsg}</div>`}
 const buzz=()=>{if(!UI.vib)return;try{navigator.vibrate&&navigator.vibrate([50,40,90])}catch(e){}};
@@ -703,7 +737,8 @@ ${row('💯','Всего дней со 100%',r=>[r.full+' дн.','за всё в
 <div class="sync">${syncMsg}</div>`}
 const HP={mint:['#8fe0c0','#2fb089'],sunset:['#ffb38a','#f0605a'],night:['#d3b8ff','#7a5af0']};
 const PALS=[['lav','Лаванда','#b7a6f0'],['mint','Мята','#8fe0c0'],['sunset','Закат','#ffb38a'],['night','Ночь','#2d2866']];
-function applyTheme(){const t=(S&&S.theme)||'lav',r=document.documentElement;r.dataset.pal=t;if(t==='night')r.dataset.theme='dark';else if(t==='lav')r.removeAttribute('data-theme');else r.dataset.theme='light'}
+function applyTheme(){const t=(S&&S.theme)||'lav',r=document.documentElement;r.dataset.pal=t;if(t==='night')r.dataset.theme='dark';else if(t==='lav')r.removeAttribute('data-theme');else r.dataset.theme='light';const dk=r.dataset.theme==='dark'||(r.dataset.theme!=='light'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);r.classList.toggle('dk',dk)}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>applyTheme())}catch(e){}
 const themeForm=()=>`<span class="lbl" style="display:block;margin-top:4px">Оформление: ${PEOPLE.find(p=>p.id===who).n}</span><div class="pals">${PALS.map(([id,n,c])=>`<button class="pal ${(S.theme||'lav')===id?'on':''}" data-pal="${id}"><i style="background:${c}"></i>${n}</button>`).join('')}</div><div style="height:12px"></div>`;
 let popDay=false,enT=null;
 function enter(){const a=document.getElementById('app');a.classList.add('enter');clearTimeout(enT);enT=setTimeout(()=>a.classList.remove('enter'),1300)}
