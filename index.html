@@ -328,6 +328,21 @@ html.dk .mc-heart svg{filter:drop-shadow(0 0 12px rgba(255,110,150,.35))}
 html.dk .cl{filter:drop-shadow(0 0 5px color-mix(in srgb,currentColor 0%,rgba(255,255,255,.18)))}
 html.dk .nav{box-shadow:0 0 0 1px rgba(255,255,255,.06)}
 html.dk .sw.on i{box-shadow:0 0 12px color-mix(in srgb,var(--acc) 55%,transparent)}
+:root{--pa:#4a82f0}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:var(--pa);z-index:90;pointer-events:none;transition:background .4s}
+button:focus-visible,input:focus-visible,select:focus-visible{outline-color:var(--pa)}
+.seg button.on{color:var(--pa)}
+.nav{color:var(--pa)}
+.mcbtn{color:var(--pa)}
+.add .addb{background:var(--pa)}
+.mcb .row .pri{background:var(--pa)}
+.sw.on i{background:var(--pa)}
+html.dk .sw.on i{box-shadow:0 0 12px color-mix(in srgb,var(--pa) 55%,transparent)}
+.pal.on{box-shadow:0 0 0 2px var(--pa)}
+.lovebtn{background:color-mix(in srgb,var(--pa) 14%,var(--card));color:var(--pa)}
+.lovebtn.sent{background:var(--pa);color:#fff}
+.d.sel{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--pa)}
+.link{color:color-mix(in srgb,var(--pa) 70%,var(--mute))}
 .sync{text-align:center;color:var(--mute);font-size:12px}
 .duo{display:flex;gap:10px}
 .mini{flex:1;border-radius:22px;background:var(--cell);padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600}
@@ -826,7 +841,7 @@ ${rows||'<div class="note">В этом месяце ещё нет дней</div>
 <div class="sync">${syncMsg}</div>`}
 function render(){
 if(!CODE){document.getElementById('app').innerHTML='<div class="card" style="margin-top:18vh;text-align:center"><h2 style="margin:0 0 6px;font-size:19px">Планер</h2><p style="color:var(--mute);font-size:14px;margin:0">Введите код доступа — один раз на этом устройстве</p><div class="ctl" style="margin-top:16px"><input id="code" type="password" autocomplete="off" placeholder="код"><button data-c="1">→</button></div></div>';return}
-const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setProperty('--acc',acc);applyTheme();
+const acc=PEOPLE.find(p=>p.id===who).acc;document.documentElement.style.setProperty('--acc',acc);{const dp=PEOPLE.find(p=>p.id===who).deep;document.documentElement.style.setProperty('--pa',dp);const mt=document.querySelector('meta[name="theme-color"]');if(mt)mt.setAttribute('content',dp)}applyTheme();
 if(view==='hist'){renderHist();return}
 if(view==='stats'){renderStats();return}
 if(view==='sky'){renderSky();return}
