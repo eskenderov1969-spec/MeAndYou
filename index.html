@@ -405,21 +405,32 @@ const CFG={url:'https://qffmezdmqmsvunmnzowl.supabase.co',key:'sb_publishable_vo
 try{const h=decodeURIComponent(location.hash.slice(1));if(h){localStorage.setItem('habits-code',h);history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
 let CODE='';try{CODE=localStorage.getItem('habits-code')||''}catch(e){}
 let remote=!!(CFG.url&&CFG.key&&CODE);let dirty={};try{dirty=JSON.parse(localStorage.getItem('dirty')||'{}')}catch(e){}
-const tms={},pd=()=>{try{localStorage.setItem('dirty',JSON.stringify(dirty))}catch(e){}};
+const tms={},pd=()=>{try{localStorage.setItem('dirty',JSON.stringify(dirty))}catch(e){}},pushing={},ver={},editAt={};
+let peerVer={};try{peerVer=JSON.parse(localStorage.getItem('peerver')||'{}')}catch(e){}
 async function rpc(fn,body){const r=await fetch(CFG.url.replace(/\/rest\/v1\/?$/,'').replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:Object.assign({'Content-Type':'application/json',apikey:CFG.key},CFG.key.startsWith('sb_')?{}:{Authorization:'Bearer '+CFG.key}),body:JSON.stringify(body)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null}
 const setSync=m=>{syncMsg=m;if(m.startsWith('Синхронизировано')){try{localStorage.setItem('lastsync',String(Date.now()))}catch(e){}}const e=document.querySelector('.sync');if(e)e.textContent=m};
-function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(async()=>{try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:{goals:P[w].goals,days:P[w].days,custom:P[w].custom,nid:P[w].nid,v2:P[w].v2,dates:P[w].dates,theme:P[w].theme,sched:P[w].sched,ready:P[w].ready}});delete dirty[w];pd();setSync('Синхронизировано ✓')}catch(e){setSync('Нет связи — сохранено на устройстве, отправится позже')}},500)}
+const payload=w=>({goals:P[w].goals,days:P[w].days,custom:P[w].custom,nid:P[w].nid,v2:P[w].v2,dates:P[w].dates,theme:P[w].theme,sched:P[w].sched,ready:P[w].ready,app:APP_VER});
+async function doPush(w){if(pushing[w])return true;pushing[w]=1;const v0=ver[w]||0;let ok=false;
+try{await rpc('save_tracker',{p_code:CODE+':'+w,p_data:payload(w)});ok=true;if((ver[w]||0)===v0){delete dirty[w];pd()}else setTimeout(()=>push(w),50)}catch(e){}
+delete pushing[w];if(ok){if(!Object.keys(dirty).length)setSync('Синхронизировано ✓')}else setSync('Нет связи — сохранено на устройстве, отправится позже');return ok}
+function push(w){clearTimeout(tms[w]);tms[w]=setTimeout(()=>doPush(w),500)}
 function save(w=who){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
-if(remote){dirty[w]=1;pd();push(w)}}
-async function pull(){if(!remote)return;let changed=false;
-try{for(const p of PEOPLE){const r=await rpc('get_tracker',{p_code:CODE+':'+p.id});
-if(dirty[p.id]){if(r&&r.days){P[p.id].days={...r.days,...P[p.id].days};changed=true}push(p.id);continue}
-if(r&&r.days){const n={goals:r.goals||P[p.id].goals,days:r.days,custom:r.custom||[],nid:r.nid||0,v2:r.v2,dates:r.dates||[],theme:r.theme,sched:r.sched||[],ready:r.ready||{}};const mg=fixD(n);if(JSON.stringify(n)!==JSON.stringify(P[p.id])){P[p.id]=n;changed=true}
-if(mg){dirty[p.id]=1;pd();push(p.id)}}
-else if(Object.keys(P[p.id].days).length){dirty[p.id]=1;pd();push(p.id)}}
-S=P[who];checkSecrets(true);if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
+if(remote){ver[w]=(ver[w]||0)+1;editAt[w]=Date.now();dirty[w]=1;pd();push(w)}}
+let pulling=false;
+async function pull(){if(!remote||pulling)return;pulling=true;const t0=Date.now();let changed=false,okAll=true;
+try{for(const p of PEOPLE){const r=await rpc('get_tracker',{p_code:CODE+':'+p.id}),D=P[p.id];peerVer[p.id]=r?(r.app||'старая'):'—';
+if(dirty[p.id]){if(r&&r.days){D.days={...r.days,...D.days};changed=true}if(!await doPush(p.id))okAll=false;continue}
+if((editAt[p.id]||0)>=t0||pushing[p.id])continue;
+if(r&&r.days){const n={goals:r.goals||D.goals,days:r.days,custom:r.custom||[],nid:r.nid||0,v2:r.v2,dates:r.dates||[],theme:r.theme,sched:r.sched||[],ready:r.ready||{}},mg=fixD(n),cur={goals:D.goals,days:D.days,custom:D.custom,nid:D.nid,v2:D.v2,dates:D.dates,theme:D.theme,sched:D.sched,ready:D.ready};
+if(JSON.stringify(n)!==JSON.stringify(cur)){Object.assign(D,n);changed=true}
+if(mg){dirty[p.id]=1;pd();if(!await doPush(p.id))okAll=false}}
+else if(Object.keys(D.days).length){dirty[p.id]=1;pd();if(!await doPush(p.id))okAll=false}}
+try{localStorage.setItem('peerver',JSON.stringify(peerVer))}catch(e){}
+checkSecrets(true);if(changed){try{localStorage.setItem(LS,JSON.stringify({P,who}))}catch(e){}
 if(!(document.activeElement&&document.activeElement.tagName==='INPUT'))render()}
-setSync('Синхронизировано ✓');pullLove()}catch(e){setSync('Нет связи — данные на этом устройстве')}}
+setSync(okAll&&!Object.keys(dirty).length?'Синхронизировано ✓':'Не всё отправлено, повторю позже');pullLove()}
+catch(e){setSync('Нет связи — данные на этом устройстве')}finally{pulling=false}}
+
 function setVal(k,i,v){const was=pctOf(S,k);checkRecord(k,i,v);if(!S.days[k])S.days[k]=[null,null,null,null,null];S.days[k][i]=v;if(pctOf(S,k)===1&&was!==1){popDay=true;setTimeout(burst,80);buzz()}if(S.days[k].every(x=>x==null))delete S.days[k];save();render();popDay=false;checkSecrets()}
 const ICONS=['<path d="M4 5h16v11H9l-5 4z"/>','<path d="M4 5.5C6 4 9 4 12 6c3-2 6-2 8-.5V19c-2-1.5-5-1.5-8 .5-3-2-6-2-8-.5z"/><path d="M12 6v13.5"/>','<ellipse cx="8.5" cy="9" rx="3" ry="4.5"/><ellipse cx="15.5" cy="15" rx="3" ry="4.5"/>','<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'];
 const tabs=()=>`<div class="trow"><div class="seg tabs">${[['track','Планер'],['stats','Статистика'],['sky','Небо'],['hist','История']].map(([v,t])=>`<button data-v="${v}" class="${view===v||(v==='hist'&&view==='fame')?'on':''}">${t}</button>`).join('')}</div><button class="gear ${view==='set'?'on':''}" data-v="set" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button></div>`;
@@ -783,7 +794,7 @@ let UI={vib:1,conf:1,splash:1,heart:1,anim:1,hc:0,sz:0};try{UI={...UI,...JSON.pa
 const applyUI=()=>{const r=document.documentElement.classList;r.toggle('noanim',!UI.anim);r.toggle('hc',!!UI.hc);r.remove('sz1','sz2');if(UI.sz)r.add('sz'+UI.sz)};
 const saveUI=()=>{try{localStorage.setItem('cfg',JSON.stringify(UI))}catch(e){}applyUI()};
 applyUI();
-const APP_VER='2026.10.24-7';
+const APP_VER='2026.10.25-1';
 function lastSyncText(){let t=0;try{t=+localStorage.getItem('lastsync')||0}catch(e){}if(!t)return 'ещё не было';const d=new Date(t),tm=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});return (d.toDateString()===new Date().toDateString()?'сегодня':d.getDate()+' '+MG[d.getMonth()])+', '+tm}
 function renderSettings(){const row=(k,t,d)=>`<button class="sw ${UI[k]?'on':''}" data-ui="${k}"><span><b>${t}</b><small>${d}</small></span><i></i></button>`,quiet=!UI.vib&&!UI.conf&&!UI.anim,
 pend=Object.keys(dirty).map(id=>PEOPLE.find(p=>p.id===id)).filter(Boolean).map(p=>p.n),dg=(a,b)=>`<div class="dg"><span>${a}</span><b>${b}</b></div>`;
@@ -795,7 +806,7 @@ document.getElementById('app').innerHTML=`${tabs()}
 <div class="card">${themeForm()}</div>
 ${goalsCard()}
 ${scheduleCard()}
-<div class="card"><span class="lbl">Диагностика</span><div class="dgs">${dg('Версия планера',APP_VER)}${dg('Связь',navigator.onLine?'есть':'нет')}${dg('Хранилище',remote?'общая база подключена':'только на этом устройстве')}${dg('Последняя синхронизация',lastSyncText())}${dg('Ждут отправки',pend.length?'записи: '+pend.join(', '):'нет')}${dg('Работа без интернета','<span id="swst">проверяю…</span>')}</div><div class="acts2"><button data-diag="sync">Проверить сейчас</button><button data-diag="reload">Обновить приложение</button></div></div>
+<div class="card"><span class="lbl">Диагностика</span><div class="dgs">${dg('Версия планера',APP_VER)}${dg('Связь',navigator.onLine?'есть':'нет')}${dg('Хранилище',remote?'общая база подключена':'только на этом устройстве')}${dg('Последняя синхронизация',lastSyncText())}${dg('Ждут отправки',pend.length?'записи: '+pend.join(', '):'нет')}${PEOPLE.map(p=>dg('Версия у '+p.gen,peerVer[p.id]||'неизвестно')).join('')}${dg('Работа без интернета','<span id="swst">проверяю…</span>')}</div><div class="acts2"><button data-diag="sync">Проверить сейчас</button><button data-diag="reload">Обновить приложение</button></div></div>
 <button class="link" data-x="1">Сменить код доступа</button>
 <div class="sync">Настройки хранятся на этом устройстве</div>`;
 if(navigator.serviceWorker)navigator.serviceWorker.getRegistration().then(r=>{const e=document.getElementById('swst');if(e)e.textContent=r&&r.active?'включён':'не включён'}).catch(()=>{const e=document.getElementById('swst');if(e)e.textContent='не поддерживается'});else{const e=document.getElementById('swst');if(e)e.textContent='не поддерживается'}}
